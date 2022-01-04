@@ -16,5 +16,19 @@
             RequiredClass = _job;
             Crit_Rate = _crit_Rate;
         }
+
+        public string calculateEquipStats(Player p)
+        {
+            string result = string.Empty;
+            var equation = (this.Attack - p.Attack);
+
+            if (equation >= 0)
+            {
+                result = "+" + equation.ToString();
+            }
+            else result = "-" + equation.ToString();
+
+            return result;
+        }
     }
 }

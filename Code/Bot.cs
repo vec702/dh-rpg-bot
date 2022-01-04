@@ -188,6 +188,7 @@ namespace dotHack_Discord_Game
                     monsterSpawned = true;
 
                     // start the despawn timer when the monster appears
+                    if (timer.Enabled) timer.Stop();
                     timer.Start();
 
                     monsterMessage = await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync(embed);
@@ -239,6 +240,7 @@ namespace dotHack_Discord_Game
 
                         if (despawned)
                         {
+                            timer.Stop();
                             await SendMessage("The " + randomMonster.Name + " has got away.");
                             if(monsterMessage != null) await monsterMessage.DeleteAsync();
                             if(portalMessage != null) await portalMessage.DeleteAsync();

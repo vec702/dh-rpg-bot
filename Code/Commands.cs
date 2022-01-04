@@ -214,7 +214,7 @@ namespace dotHack_Discord_Game
                                 }
                                 else
                                 {
-                                    await Bot.SendMessage("You must be a level " + item.RequiredLevel + " " + item.RequiredClass + " to equip this weapon.");
+                                    await Bot.SendMessage("You must be a " + item.RequiredClass + " to equip this weapon.");
                                     break;
                                 }
                             }
@@ -266,7 +266,9 @@ namespace dotHack_Discord_Game
                     };
 
                     string inventoryOutput = string.Empty;
-                    inventoryOutput += inventoryOutput.Count() % 5 == 0 ? string.Join(", ", p.Inventory.Select(weapon => weapon.Name).ToArray()) : "\n";
+                    inventoryOutput += inventoryOutput.Count() % 5 == 0 ? string.Join(", ",
+                        p.Inventory.Select(weapon =>
+                            weapon.RequiredClass == p.Class ? weapon.Name + " (" + (weapon.calculateEquipStats(p)) + ")" : weapon.Name ).ToArray()) : "\n";
                     embed.Description += inventoryOutput;
 
                     await Bot.SendMessage(embed);
