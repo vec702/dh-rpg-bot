@@ -121,7 +121,7 @@ namespace dotHack_Discord_Game
 
             despawned = false;
 
-            timer.Interval = 300;
+            timer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
             timer.Elapsed += despawnMonster;
 
             // check that a spawn isn't already active
