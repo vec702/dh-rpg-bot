@@ -66,8 +66,8 @@ namespace dotHack_Discord_Game
 
             client = new DiscordClient(config);
             client.Ready += OnClientReady;
-            // client.SocketClosed += SavePlayerData;
-            // client.SocketOpened += LoadPlayerData;
+            //client.SocketClosed += SavePlayerData;
+            //client.SocketOpened += LoadPlayerData;
             client.MessageCreated += SummonPortalChance;
 
             client.UseInteractivity(new InteractivityConfiguration
@@ -214,7 +214,7 @@ namespace dotHack_Discord_Game
 
                                     if (Players.TryGetValue(user.Id.ToString(), out Player p))
                                     {
-                                        damage = Convert.ToInt32(random.Next(p.Attack, p.Attack * Convert.ToInt32(p.Equip.Crit_Rate)) * dmgRate);
+                                        damage = Convert.ToInt32(random.Next(p.Equip.Attack, p.Equip.Attack * Convert.ToInt32(p.Equip.Crit_Rate)) * dmgRate);
                                         damage = (int)Math.Round(Convert.ToDouble(damage), 0);
                                     }
 
@@ -312,16 +312,6 @@ namespace dotHack_Discord_Game
         private void despawnMonster(object sender, ElapsedEventArgs e)
         {
             despawned = true;
-        }
-
-        public static async Task SendMessage(string Message)
-        {
-            await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync(Message);
-        }
-
-        public static async Task SendMessage(DiscordEmbed Message)
-        {
-            await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync(Message);
         }
         #endregion
 
@@ -436,6 +426,40 @@ namespace dotHack_Discord_Game
         #endregion
 
         #region Other Tasks
+        public static async Task SendMessage(string Message)
+        {
+            await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync(Message);
+        }
+
+        public static async Task SendMessage(DiscordEmbed Message)
+        {
+            await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync(Message);
+        }
+
+        private async Task SavePlayerData(DiscordClient sender, SocketCloseEventArgs e)
+        {
+            if (Bot.Players.ContainsKey(client.CurrentUser.Id.ToString()))
+            {
+                if (Bot.Players.TryGetValue(client.CurrentUser.Id.ToString(), out Player p))
+                {
+                    await Data.SaveSettings(p);
+                    await Bot.SendMessage(p.Name + " saved their data.");
+                }
+            }
+        }
+
+        private async Task LoadPlayerData(DiscordClient sender, SocketEventArgs e)
+        {
+            if (Bot.Players.ContainsKey(client.CurrentUser.Id.ToString()))
+            {
+                if (Bot.Players.TryGetValue(client.CurrentUser.Id.ToString(), out Player p))
+                {
+                    await Data.LoadSettings();
+                    await Bot.SendMessage(client.CurrentUser.Username + " loaded their data.");
+                }
+            }
+        }
+
         private async Task Commands_CommandErrored(CommandsNextExtension sender, CommandErrorEventArgs e)
         {
             e.Context.Client.Logger.LogError(BotEventId, $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}", DateTime.Now);

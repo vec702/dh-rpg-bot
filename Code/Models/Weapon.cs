@@ -20,7 +20,7 @@
         public string calculateEquipStats(Player p)
         {
             string result = string.Empty;
-            var equation = (this.Attack - p.Attack);
+            var equation = (this.Attack - p.Equip.Attack);
 
             if (equation >= 0)
             {

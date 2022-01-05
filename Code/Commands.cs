@@ -12,6 +12,8 @@ namespace dotHack_Discord_Game
 {
     public class Commands : BaseCommandModule
     {
+        #region Owner Commands
+        #region //botchannel
         [Command("botchannel"), Description("Set the channel the bot will summon enemies in.")]
         public async Task Botchannel(CommandContext ctx)
         {
@@ -23,7 +25,9 @@ namespace dotHack_Discord_Game
                 Bot.BotChannelID = Convert.ToUInt64(response.Result.Content.ToString());
             }
         }
+        #endregion
 
+        #region //exprate
         [Command("exprate"), Description("Set the EXP Rate at which the bot will reward players.")]
         public async Task exprate(CommandContext ctx, params double[] _newRate)
         {
@@ -40,7 +44,9 @@ namespace dotHack_Discord_Game
                 }
             }
         }
+        #endregion
 
+        #region //droprate
         [Command("droprate"), Description("Set the DROP Rate at which the bot will reward players items.")]
         public async Task droprate(CommandContext ctx, params double[] _newRate)
         {
@@ -57,7 +63,9 @@ namespace dotHack_Discord_Game
                 }
             }
         }
+        #endregion
 
+        #region //dmgrate
         [Command("dmgrate"), Description("Set the rate at which the bot will calculate damage.")]
         public async Task dmgrate(CommandContext ctx, params double[] _newRate)
         {
@@ -74,7 +82,11 @@ namespace dotHack_Discord_Game
                 }
             }
         }
+        #endregion
+        #endregion
 
+        #region Player Commands
+        #region //signup
         [Command("signup"), Description("Sign-up to fight .hack// enemies.")]
         public async Task Signup(CommandContext ctx, params string[] _class)
         {
@@ -171,7 +183,9 @@ namespace dotHack_Discord_Game
                 await Bot.SendMessage("User " + ctx.User.Username.ToString() + " already exists!");
             }
         }
+        #endregion
 
+        #region //equip
         [Command("equip"), Description("Equip a specific weapon in your inventory.")]
         public async Task Equip(CommandContext ctx, params string[] _item)
         {
@@ -210,7 +224,7 @@ namespace dotHack_Discord_Game
                                 {
                                     // then equip that item
                                     p.Equip_Weapon(item);
-                                    await Bot.SendMessage(p.Name + " equipped " + p.Equip.Name + " (" + p.Attack + " Attack)");
+                                    await Bot.SendMessage(p.Name + " equipped " + p.Equip.Name + " (" + p.Equip.Attack + " Attack)");
                                 }
                                 else
                                 {
@@ -247,7 +261,38 @@ namespace dotHack_Discord_Game
                 await Bot.SendMessage("User does not exist! Have you tried to \"//signup\"?");
             }
         }
+        #endregion
 
+        #region //save
+        [Command("save"), Description("Save your player data")]
+        public async Task Save(CommandContext ctx)
+        {
+            if (Bot.Players.ContainsKey(ctx.User.Id.ToString()))
+            {
+                if (Bot.Players.TryGetValue(ctx.User.Id.ToString(), out Player p))
+                {
+                    await Data.SaveSettings(p);
+                    await Bot.SendMessage(p.Name + " saved their data.");
+                }
+            }
+        }
+        #endregion
+
+        #region //load
+        [Command("load"), Description("Save your player data")]
+        public async Task Load(CommandContext ctx)
+        {
+            if (!Bot.Players.ContainsKey(ctx.User.Id.ToString()))
+            {
+                if (!Bot.Players.TryGetValue(ctx.User.Id.ToString(), out Player p))
+                {
+                    await Data.LoadSettings();
+                }
+            }
+        }
+        #endregion
+
+        #region //me
         [Command("me"), Description("See your stats.")]
         public async Task Me(CommandContext ctx)
         {
@@ -279,6 +324,9 @@ namespace dotHack_Discord_Game
                 await Bot.SendMessage("User does not exist! Have you tried to \"//signup\"?");
             }
         }
+        #endregion
+
+        #region //top
         [Command("top"), Description("See the top players.")]
         public async Task Top(CommandContext ctx)
         {
@@ -302,5 +350,7 @@ namespace dotHack_Discord_Game
 
             await Bot.SendMessage(embed);
         }
+        #endregion
+        #endregion
     }
 }

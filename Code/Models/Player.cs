@@ -14,14 +14,12 @@ namespace dotHack_Discord_Game.Models
         public List<Weapon> Inventory { get; set; }
         public List<Item> Items { get; set; }
         public Weapon Equip { get; set; }
-        public int Attack { get; set; }
 
         public Player(ulong _Id, string _Name)
         {
             Id = _Id;
             Name = _Name;
             Level = 1;
-            Attack = 1;
             Kills = 0;
             Experience = 0;
             Max_Experience = 1000;
@@ -33,7 +31,6 @@ namespace dotHack_Discord_Game.Models
         public void Equip_Weapon(Weapon weapon)
         {
             Equip = weapon;
-            Attack = weapon.Attack;
         }
 
         public void Levelcheck()
