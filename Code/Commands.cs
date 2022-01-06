@@ -306,9 +306,17 @@ namespace dotHack_Discord_Game
                         Description = "Class: " + p.Class.ToString() + "\nLevel: " + p.Level +
                             "\nExperience: " + p.Experience + " / " + p.Max_Experience +
                             "\nEquipped Weapon: " + p.Equip.Name + " (" + p.Equip.Attack + " Attack)" +
-                            "\nEnemies defeated: " + p.Kills.ToString() +
-                            "\nInventory: ",
+                            "\nEnemies defeated: " + p.Kills.ToString(),
                     };
+
+                    embed.Description += "\nKey Items: ";
+
+                    string itemsOutput = string.Empty;
+
+                    itemsOutput += itemsOutput.Count() % 5 == 0 ? string.Join(", ", p.Items.Select(item => item.Name).ToArray()) : "\n";
+                    embed.Description += itemsOutput;
+
+                    embed.Description += "\nInventory: ";
 
                     string inventoryOutput = string.Empty;
                     inventoryOutput += inventoryOutput.Count() % 5 == 0 ? string.Join(", ",

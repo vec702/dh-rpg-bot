@@ -8,8 +8,8 @@
             Usable
         }
 
-        private string Name;
-        private Type ItemType;
+        public string Name;
+        public Type ItemType;
 
         public Item(string _name, Type _itemType)
         {

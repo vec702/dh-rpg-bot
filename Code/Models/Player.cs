@@ -33,6 +33,12 @@ namespace dotHack_Discord_Game.Models
             Equip = weapon;
         }
 
+        public void Gain_Experience(int number)
+        {
+            Experience += number;
+            Levelcheck();
+        }
+
         public void Levelcheck()
         {
             while(Experience >= Max_Experience)

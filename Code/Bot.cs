@@ -33,11 +33,19 @@ namespace dotHack_Discord_Game
 
         public static double expRate = 3.0;
         public static double dmgRate = 3.0;
-        public static double dropRate = 1.0;
+        public static double dropRate = 3.0;
 
         private static bool monsterSpawned = false;
         private static bool portalSpawned = false;
         private static bool despawned = false;
+
+        private Weapon[] t1Drops = new Weapon[] { LongarmWeapons.Bronze_Spear, BlademasterWeapons.Brave_Sword, TwinbladeWeapons.Amateur_Blades, HeavyaxeWeapons.Hatchet, WavemasterWeapons.Iron_Rod, HeavybladeWeapons.Steelblade };
+        private Weapon[] t2Drops = new Weapon[] { LongarmWeapons.Amazon_Spear, TwinbladeWeapons.Steel_Blades, HeavybladeWeapons.Flamberge, HeavyaxeWeapons.Water_Axe, BlademasterWeapons.Strange_Blade, WavemasterWeapons.Fire_Wand };
+        private Weapon[] t3Drops = new Weapon[] { LongarmWeapons.Gold_Spear, TwinbladeWeapons.Ronin_Blades, HeavybladeWeapons.Nodachi, HeavyaxeWeapons.Razor_Axe, BlademasterWeapons.Corpseblade, WavemasterWeapons.Wand_of_Wisdom };
+        private Weapon[] t4Drops = new Weapon[] { LongarmWeapons.Bloody_Lance, TwinbladeWeapons.Masterblades, HeavybladeWeapons.Magnifier, HeavyaxeWeapons.Earth_Axe, BlademasterWeapons.Souleater, WavemasterWeapons.Starstorm_Wand };
+        private Weapon[] t5Drops = new Weapon[] { LongarmWeapons.Berserk_Spear, TwinbladeWeapons.Shirogane, HeavybladeWeapons.Sharp_Blade, HeavyaxeWeapons.Masters_Axe, BlademasterWeapons.Glitter, WavemasterWeapons.Bubble_Rod };
+        private Weapon[] t6Drops = new Weapon[] { LongarmWeapons.Steel_Spear, TwinbladeWeapons.Slayers, HeavybladeWeapons.Claymore, HeavyaxeWeapons.Full_Swing, BlademasterWeapons.HeavenAndEarth, WavemasterWeapons.Nerd_Staff };
+        private Weapon[] t7Drops = new Weapon[] { LongarmWeapons.Adamant_Lance, TwinbladeWeapons.Kyoura, HeavybladeWeapons.Light_Giver, HeavyaxeWeapons.Sinners_Axe, BlademasterWeapons.Matoi, WavemasterWeapons.Gaias_Staff };
         #endregion
 
         #region Main Task
@@ -119,6 +127,8 @@ namespace dotHack_Discord_Game
             Monster randomMonster = RandomMonster();
             DiscordMessage monsterMessage = null;
 
+            var interactivity = client.GetInteractivity();
+
             despawned = false;
 
             timer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
@@ -140,13 +150,11 @@ namespace dotHack_Discord_Game
                 // create the portal message
                 var portalMessage = await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync("A monster portal has appeared.");
 
-                var interactivity = client.GetInteractivity();
-
                 // and the "fight" reaction
                 var emoji = DiscordEmoji.FromName(client, ":crossed_swords:");
                 await portalMessage.CreateReactionAsync(emoji);
 
-                var portalResult = await interactivity.CollectReactionsAsync(portalMessage, TimeSpan.FromSeconds(1));
+                var portalResult = await interactivity.CollectReactionsAsync(portalMessage, TimeSpan.FromSeconds(0.5));
 
                 while (portalSpawned)
                 {
@@ -157,7 +165,7 @@ namespace dotHack_Discord_Game
                         if (!user.IsBot)
                         {
                             // and they're registered for the game
-                            if (Players.TryGetValue(user.Id.ToString(), out Player p))
+                            if (IsRegistered(user))
                             {
                                 portalOpened = true;
                                 portalSpawned = false;
@@ -187,20 +195,20 @@ namespace dotHack_Discord_Game
                     // spawn the randomly generated monster
                     monsterSpawned = true;
 
-                    // start the despawn timer when the monster appears
-                    if (timer.Enabled) timer.Stop();
-                    timer.Start();
-
                     monsterMessage = await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync(embed);
                     await monsterMessage.CreateReactionAsync(emoji);
 
-                    var monsterResult = await interactivity.CollectReactionsAsync(monsterMessage, TimeSpan.FromSeconds(1));
+                    var monsterResult = await interactivity.CollectReactionsAsync(monsterMessage, TimeSpan.FromSeconds(0.5));
+
+                    // start the despawn timer when the monster appears
+                    if (timer.Enabled) timer.Stop();
+                    timer.Start();
 
                     while (health_left > 0)
                     {
                         foreach (var user in await monsterMessage.GetReactionsAsync(emoji))
                         {
-                            if(!Players.TryGetValue(user.Id.ToString(), out Player p3) && !user.IsBot)
+                            if(!IsRegistered(user) && !user.IsBot)
                             {
                                 await SendMessage("You need to \"//signup\" before you can start fighting!");
                             }
@@ -212,11 +220,9 @@ namespace dotHack_Discord_Game
                                     var damage = 0;
                                     Random random = new Random();
 
-                                    if (Players.TryGetValue(user.Id.ToString(), out Player p))
-                                    {
-                                        damage = Convert.ToInt32(random.Next(p.Equip.Attack, p.Equip.Attack * Convert.ToInt32(p.Equip.Crit_Rate)) * dmgRate);
-                                        damage = (int)Math.Round(Convert.ToDouble(damage), 0);
-                                    }
+                                    var p = GetPlayer(user);
+                                    damage = Convert.ToInt32(random.Next(p.Equip.Attack, p.Equip.Attack * Convert.ToInt32(p.Equip.Crit_Rate)) * dmgRate);
+                                    damage = (int)Math.Round(Convert.ToDouble(damage), 0);
 
                                     health_left = health_left - damage;
                                     if (health_left < 0) health_left = 0;
@@ -249,69 +255,61 @@ namespace dotHack_Discord_Game
 
                     if (health_left <= 0)
                     {
-                        foreach (var user in await monsterMessage.GetReactionsAsync(emoji))
+                        _Description = "Befallen by " + attackers.First().Username.ToString();
+
+                        foreach (var attacker in attackers)
                         {
-                            if (Players.TryGetValue(user.Id.ToString(), out Player p))
+                            Random random = new Random();
+                            Weapon drop = null;
+                            Item idrop = null;
+
+                            var p = GetPlayer(attacker);
+                            var exp = Convert.ToInt32(random.Next(150, 175) * expRate);
+                            var dropChance = Convert.ToInt32(random.Next(1, 100) * dropRate);
+
+                            // if they roll >80, award the drops
+                            if (dropChance > 80)
                             {
-                                _Description = "Befallen by " + attackers.First().Username.ToString();
-                                foreach (var attacker in attackers)
+                                // if they roll a 99+, award them two drops
+                                if (dropChance > 98)
                                 {
-                                    if (attacker.Id == p.Id)
+                                    for (var i = 0; i < 2; i++)
                                     {
-                                        Random random = new Random();
-
-                                        var exp = Convert.ToInt32(random.Next(150, 175) * expRate);
-                                        var dropChance = Convert.ToInt32(random.Next(1,100) * dropRate);
-                                        Weapon drop = null;
-
-                                        if(dropChance > 80)
-                                        {
-                                            var randomDrop = random.Next(1, randomMonster.Drops.Count());
-                                            drop = randomMonster.Drops[randomDrop];
-                                        }
-
-                                        if(drop != null)
-                                        {
-                                            if (Players.TryGetValue(attacker.Id.ToString(), out Player p2))
-                                            {
-                                                await SendMessage(p2.Name + " received " + drop.Name + " from " + randomMonster.Name);
-                                                p2.Inventory.Add(drop);
-                                            }
-                                        }
-
-                                        p.Kills++;
-                                        p.Experience += Convert.ToInt32(Math.Round(Convert.ToDouble(exp)));
-                                        p.Levelcheck();
-                                    }
-
-                                    if (attacker != attackers[0])
-                                    {
-                                        _Description += ", " + attacker.Username.ToString();
+                                        var randomDrop = random.Next(1, randomMonster.Drops.Count());
+                                        drop = randomMonster.Drops[randomDrop];
+                                        AwardDrops(p, randomMonster, drop, idrop);
                                     }
                                 }
-                                await monsterMessage.ModifyAsync(x =>
+                                else
                                 {
-                                    x.Content = "";
-                                    x.Embed = new DiscordEmbedBuilder()
-                                        .WithTitle(_Title)
-                                        .WithDescription(_Description)
-                                        .WithImageUrl(_ImageUrl)
-                                        .Build();
-                                });
+                                    var randomDrop = random.Next(1, randomMonster.Drops.Count());
+                                    drop = randomMonster.Drops[randomDrop];
+                                    AwardDrops(p, randomMonster, drop, idrop);
+                                }
+                            }
+
+                            p.Kills++;
+                            p.Gain_Experience(Convert.ToInt32(Math.Round(Convert.ToDouble(exp))));
+
+                            if (attacker != attackers[0])
+                            {
+                                _Description += ", " + attacker.Username.ToString();
                             }
                         }
-
+                        await monsterMessage.ModifyAsync(x =>
+                        {
+                            x.Content = "";
+                            x.Embed = new DiscordEmbedBuilder()
+                                .WithTitle(_Title)
+                                .WithDescription(_Description)
+                                .WithImageUrl(_ImageUrl)
+                                .Build();
+                        });
                         monsterSpawned = false;
                     }
-
                 }
                 await portalMessage.DeleteAsync();
             }
-        }
-
-        private void despawnMonster(object sender, ElapsedEventArgs e)
-        {
-            despawned = true;
         }
         #endregion
 
@@ -319,48 +317,48 @@ namespace dotHack_Discord_Game
         private Monster RandomMonster()
         {
             Random random = new Random();
-            var response = random.Next(1, 9);
+            var response = random.Next(1, 15);
             switch (response)
             {
                 case 0:
-                    return new Monster("Aura", "https://static.wikia.nocookie.net/dothack/images/f/fc/Auraface.jpg", 1, new Weapon[] { }, new Item[] { KeyItems.Twilight_Bracelet });
+                    return new Monster("Aura", "https://static.wikia.nocookie.net/dothack/images/f/fc/Auraface.jpg", 1, null, new Item[] { KeyItems.Twilight_Bracelet });
                 case 1:
-                    return new Monster("Razine", "https://static.wikia.nocookie.net/dothack/images/5/53/%28001%29_Razine.jpg", 5, new Weapon[] { LongarmWeapons.Bronze_Spear, BlademasterWeapons.Brave_Sword, TwinbladeWeapons.Amateur_Blades, HeavyaxeWeapons.Hatchet, WavemasterWeapons.Iron_Rod, HeavybladeWeapons.Steelblade });
+                    return new Monster("Razine", "https://static.wikia.nocookie.net/dothack/images/5/53/%28001%29_Razine.jpg", 5, t1Drops, null);
                 case 2:
-                    return new Monster("Tetra Armor", "https://static.wikia.nocookie.net/dothack/images/2/22/(011)_Tetra_Armor.jpg", 10, new Weapon[] { LongarmWeapons.Amazon_Spear, TwinbladeWeapons.Steel_Blades, HeavybladeWeapons.Flamberge, HeavyaxeWeapons.Water_Axe, BlademasterWeapons.Strange_Blade, WavemasterWeapons.Fire_Wand });
+                    return new Monster("Tetra Armor", "https://static.wikia.nocookie.net/dothack/images/2/22/(011)_Tetra_Armor.jpg", 10, t2Drops, null);
                 case 3:
-                    return new Monster("Nobunaga's Soul", "https://static.wikia.nocookie.net/dothack/images/7/7a/(005)_Nobunaga_Soul.jpg", 5, new Weapon[] { LongarmWeapons.Bronze_Spear, BlademasterWeapons.Brave_Sword, TwinbladeWeapons.Amateur_Blades, HeavyaxeWeapons.Hatchet, WavemasterWeapons.Iron_Rod, HeavybladeWeapons.Steelblade });
+                    return new Monster("Nobunaga's Soul", "https://static.wikia.nocookie.net/dothack/images/7/7a/(005)_Nobunaga_Soul.jpg", 5, t1Drops, null);
                 case 4:
-                    return new Monster("Menhir", "https://static.wikia.nocookie.net/dothack/images/e/e7/(180)_Menhir.jpg", 10, new Weapon[] { LongarmWeapons.Gold_Spear, TwinbladeWeapons.Ronin_Blades, HeavybladeWeapons.Nodachi, HeavyaxeWeapons.Razor_Axe, BlademasterWeapons.Corpseblade, WavemasterWeapons.Wand_of_Wisdom });
+                    return new Monster("Menhir", "https://static.wikia.nocookie.net/dothack/images/e/e7/(180)_Menhir.jpg", 10, t2Drops, null);
                 case 5:
-                    return new Monster("Drygon", "https://static.wikia.nocookie.net/dothack/images/2/2d/(212)_Drygon.jpg", 20, new Weapon[] { LongarmWeapons.Bloody_Lance, TwinbladeWeapons.Master_Blades, HeavybladeWeapons.Magnifier, HeavyaxeWeapons.Earth_Axe, BlademasterWeapons.Souleater, WavemasterWeapons.Starstorm_Wand });
+                    return new Monster("Drygon", "https://static.wikia.nocookie.net/dothack/images/2/2d/(212)_Drygon.jpg", 20, t4Drops, null);
                 case 6:
-                    return new Monster("Ectoplasm", "https://static.wikia.nocookie.net/dothack/images/a/a1/(281)_Ectoplasm.jpg", 5, new Weapon[] { LongarmWeapons.Bronze_Spear, BlademasterWeapons.Brave_Sword, TwinbladeWeapons.Amateur_Blades, HeavyaxeWeapons.Hatchet, WavemasterWeapons.Iron_Rod, HeavybladeWeapons.Steelblade });
+                    return new Monster("Ectoplasm", "https://static.wikia.nocookie.net/dothack/images/a/a1/(281)_Ectoplasm.jpg", 5, t1Drops, null);
                 case 7:
-                    return new Monster("Noisy Wisp", "https://static.wikia.nocookie.net/dothack/images/f/f2/(282)_Noisy_Wisp.jpg", 5, new Weapon[] { LongarmWeapons.Bronze_Spear, BlademasterWeapons.Brave_Sword, TwinbladeWeapons.Amateur_Blades, HeavyaxeWeapons.Hatchet, WavemasterWeapons.Iron_Rod, HeavybladeWeapons.Steelblade });
+                    return new Monster("Noisy Wisp", "https://static.wikia.nocookie.net/dothack/images/f/f2/(282)_Noisy_Wisp.jpg", 5, t1Drops, null);
                 case 8:
-                    return new Monster("Mimic", "https://static.wikia.nocookie.net/dothack/images/8/8b/(241)_Mimic.jpg", 5, new Weapon[] { LongarmWeapons.Amazon_Spear, TwinbladeWeapons.Steel_Blades, HeavybladeWeapons.Flamberge, HeavyaxeWeapons.Water_Axe, BlademasterWeapons.Strange_Blade, WavemasterWeapons.Fire_Wand });
+                    return new Monster("Mimic", "https://static.wikia.nocookie.net/dothack/images/8/8b/(241)_Mimic.jpg", 5, t1Drops, null);
                 case 9:
-                    return new Monster("Squidbod", "https://static.wikia.nocookie.net/dothack/images/1/19/(012)_Squidbod.jpg", 20, new Weapon[] { LongarmWeapons.Bloody_Lance, TwinbladeWeapons.Master_Blades, HeavybladeWeapons.Magnifier, HeavyaxeWeapons.Earth_Axe, BlademasterWeapons.Souleater, WavemasterWeapons.Starstorm_Wand });
+                    return new Monster("Squidbod", "https://static.wikia.nocookie.net/dothack/images/1/19/(012)_Squidbod.jpg", 15, t3Drops, null);
+                case 10:
+                    return new Monster("General Armor", "https://static.wikia.nocookie.net/dothack/images/0/0f/(013)_General_Armor.jpg", 20, t4Drops, null);
+                case 11:
+                    return new Monster("Bone Army", "https://static.wikia.nocookie.net/dothack/images/2/23/(248)_Bone_Army.jpg", 5, t1Drops, null);
+                case 12:
+                    return new Monster("Comad Goo", "https://static.wikia.nocookie.net/dothack/images/8/8a/(062)_Comad_Goo.jpg", 30, t6Drops, null);
+                case 13:
+                    return new Monster("Dalaigon Anecdote", "https://static.wikia.nocookie.net/dothack/images/b/b0/(213)_Dalaigon_Anecdote.jpg", 35, t7Drops, null);
+                case 14:
+                    return new Monster("Dark Guru", "https://static.wikia.nocookie.net/dothack/images/f/fd/(028)_Dark_Guru.jpg", 25, t5Drops, null);
+                case 15:
+                    return new Monster("Dark Horse", "https://static.wikia.nocookie.net/dothack/images/f/f9/(009)_Dark_Horse.jpg", 20, t4Drops, null);
                 default:
-                    return new Monster("", "", 0, null);
+                    return new Monster("", "", 0, null, null);
                 
                 /* 
 
                     old format, still need to merge these...
-                  
-                    return new string[] { "General Armor", "https://static.wikia.nocookie.net/dothack/images/0/0f/(013)_General_Armor.jpg", "25" };
-                case 11:
-                    return new string[] { "Bone Army", "https://static.wikia.nocookie.net/dothack/images/2/23/(248)_Bone_Army.jpg", "15" };
-                case 12:
-                    return new string[] { "Comad Goo", "https://static.wikia.nocookie.net/dothack/images/8/8a/(062)_Comad_Goo.jpg", "30" };
-                case 13:
-                    return new string[] { "Dalaigon Anecdote", "https://static.wikia.nocookie.net/dothack/images/b/b0/(213)_Dalaigon_Anecdote.jpg", "30" };
-                case 14:
-                    return new string[] { "Dark Guru", "https://static.wikia.nocookie.net/dothack/images/f/fd/(028)_Dark_Guru.jpg", "15" };
-                case 15:
-                    return new string[] { "Dark Horse", "https://static.wikia.nocookie.net/dothack/images/f/f9/(009)_Dark_Horse.jpg", "20" };
-                case 16:
+
                     return new string[] { "Dark Lord", "https://static.wikia.nocookie.net/dothack/images/8/8d/(035)_Dark_Lord.jpg", "20" };
                 case 17:
                     return new string[] { "Deadly Present", "https://static.wikia.nocookie.net/dothack/images/b/b5/(244)_Deadly_Present.jpg", "15" };
@@ -436,6 +434,38 @@ namespace dotHack_Discord_Game
             await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync(Message);
         }
 
+        private void despawnMonster(object sender, ElapsedEventArgs e)
+        {
+            despawned = true;
+        }
+
+        public Player GetPlayer(DiscordUser user)
+        {
+            if (Players.TryGetValue(user.Id.ToString(), out Player p)) return p;
+            return new Player(0, "null");
+        }
+
+        public bool IsRegistered(DiscordUser user)
+        {
+            if (Players.TryGetValue(user.Id.ToString(), out Player p)) return true;
+            return false;
+        }
+
+        public async void AwardDrops(Player p, Monster Dropper, Weapon WeaponDrop, Item ItemDrop)
+        {
+            if (ItemDrop != null)
+            {
+                await SendMessage(p.Name + " received " + ItemDrop.Name + " from " + Dropper.Name);
+                p.Items.Add(ItemDrop);
+            }
+
+            if (WeaponDrop != null)
+            {
+                await SendMessage(p.Name + " received " + WeaponDrop.Name + " from " + Dropper.Name);
+                p.Inventory.Add(WeaponDrop);
+            }
+        }
+
         private async Task SavePlayerData(DiscordClient sender, SocketCloseEventArgs e)
         {
             if (Bot.Players.ContainsKey(client.CurrentUser.Id.ToString()))
@@ -447,7 +477,6 @@ namespace dotHack_Discord_Game
                 }
             }
         }
-
         private async Task LoadPlayerData(DiscordClient sender, SocketEventArgs e)
         {
             if (Bot.Players.ContainsKey(client.CurrentUser.Id.ToString()))
