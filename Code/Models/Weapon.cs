@@ -2,12 +2,15 @@
 {
     public class Weapon
     {
+        #region Weapon Declarations
         public string Name { get; set; }
         public int RequiredLevel { get; set; }
         public int Attack { get; set; }
         public JobClass RequiredClass { get; set; }
         public double Crit_Rate { get; set; }
+        #endregion
 
+        #region Weapon Functions
         public Weapon(string _name, int _level, int _attack, double _crit_Rate, JobClass _job)
         {
             Name = _name;
@@ -30,5 +33,6 @@
 
             return result;
         }
+        #endregion
     }
 }

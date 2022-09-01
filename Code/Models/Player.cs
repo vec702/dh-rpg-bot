@@ -39,6 +39,16 @@ namespace dotHack_Discord_Game.Models
             Levelcheck();
         }
 
+        public bool HasTwilightBracelet()
+        {
+            bool toReturn = false;
+            foreach (var k in Items)
+            {
+                if(k.Name == "Twilight Bracelet") toReturn = true;
+            }
+
+            return toReturn;
+        }
         public void Levelcheck()
         {
             while(Experience >= Max_Experience)

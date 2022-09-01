@@ -1,10 +1,14 @@
-﻿using dotHack_Discord_Game.Models;
+﻿#region Usings
+using dotHack_Discord_Game.Models;
+using DSharpPlus;
+using DSharpPlus.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+#endregion
 
 namespace dotHack_Discord_Game
 {
@@ -21,8 +25,13 @@ namespace dotHack_Discord_Game
         #region Save Function
         public static async Task SaveSettings(Player p)
         {
-            var filePath = Directory.GetCurrentDirectory() + "/saves/" + Bot.client.CurrentUser.Id.ToString() + ".json";
+            var filePath = Directory.GetCurrentDirectory() + "/saves/" + p.Id.ToString() + ".json";
+            
+            if (File.Exists(filePath)) File.Delete(filePath);
+            GC.Collect();
+
             string json = AddSquareBrackets(JsonConvert.SerializeObject(p));
+
             using (StreamWriter str = new StreamWriter(filePath))
             {
                 await str.WriteAsync(json);
@@ -31,10 +40,10 @@ namespace dotHack_Discord_Game
         #endregion
 
         #region Load Function
-        public static async Task LoadSettings()
+        public static async Task LoadSettings(DiscordUser user)
         {
             var filePath = Directory.GetCurrentDirectory() + "/saves/";
-            string[] jsonFile = Directory.GetFiles(filePath, Bot.client.CurrentUser.Id + ".json");
+            string[] jsonFile = Directory.GetFiles(filePath, user.Id + ".json");
             StreamReader reader = new StreamReader(jsonFile[0]);
             string jsonString = reader.ReadToEnd();
 
@@ -104,6 +113,14 @@ namespace dotHack_Discord_Game
                 if(itemsInv_Length > 0)
                 {
                     // todo: logic for items
+                    for (int i = 0; i < itemsInv_Length; i++)
+                    {
+                        string iname = objs[0]["Items"][i]["Name"].ToString().Trim().Replace(",", "");
+                        int itype = Convert.ToInt32(objs[0]["Items"][i]["ItemType"].ToString().Trim().Replace(",", ""));
+                        Item item = new Item(iname, (Item.Type)itype);
+
+                        player.Items.Add(item);
+                    }
                 }
                 #endregion
 
@@ -115,6 +132,10 @@ namespace dotHack_Discord_Game
             catch (Exception ex)
             {
                 await Bot.SendMessage("[DEBUG] Exception caught: " + ex.Message + "\n\nLog: " + ex.ToString());
+            }
+            finally
+            {
+                GC.Collect();
             }
         }
         #endregion

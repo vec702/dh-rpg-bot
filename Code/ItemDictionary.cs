@@ -2,11 +2,21 @@
 
 namespace dotHack_Discord_Game
 {
+    #region Key Items
     public class KeyItems
     {
         public static Item Twilight_Bracelet = new Item("Twilight Bracelet", Item.Type.Key);
     }
+    #endregion
 
+    public class UsableItems
+    {
+        public static Item AttackPlus_Book = new Item("Attack+ Book", Item.Type.Usable);
+        public static Item CritPlus_Book = new Item("Crit+ Book", Item.Type.Usable);
+        public static Item Virus_Core = new Item("Virus Core", Item.Type.Usable);
+    }
+
+    #region Longarm Weapons
     public class LongarmWeapons
     {
         //                                              Name                Lvl Atk     Crit     Required Class
@@ -18,7 +28,9 @@ namespace dotHack_Discord_Game
         public static Weapon Steel_Spear = new Weapon("Steel Spear",        15, 23,     1.25,    JobClass.Longarm);
         public static Weapon Adamant_Lance = new Weapon("Adamant Lance",    20, 25,     1.25,    JobClass.Longarm);
     }
+    #endregion
 
+    #region Twinblade Weapons
     public class TwinbladeWeapons
     {
         //                                              Name                 Lvl Atk         Crit  Required Class
@@ -30,6 +42,9 @@ namespace dotHack_Discord_Game
         public static Weapon Slayers = new Weapon("Slayers",                 17, 15,         2,    JobClass.Twinblade);
         public static Weapon Kyoura = new Weapon("Kyoura",                   22, 17,         2,    JobClass.Twinblade);
     }
+    #endregion
+
+    #region Heavyblade Weapons
     public class HeavybladeWeapons
     {
         //                                            Name                   Lvl Atk     Crit    Required Class
@@ -41,6 +56,9 @@ namespace dotHack_Discord_Game
         public static Weapon Claymore = new Weapon("Claymore",               15, 17,     1.25,   JobClass.Heavyblade);
         public static Weapon Light_Giver = new Weapon("Light Giver",         20, 19,     1.25,   JobClass.Heavyblade);
     }
+    #endregion
+
+    #region Heavyaxe Weapons
     public class HeavyaxeWeapons
     {
         //                                            Name                   Lvl Atk     Crit    Required Class
@@ -52,6 +70,9 @@ namespace dotHack_Discord_Game
         public static Weapon Full_Swing = new Weapon("Full Swing",           17, 16,     1.5,    JobClass.Heavyaxe);
         public static Weapon Sinners_Axe = new Weapon("Sinner's Axe",        21, 19,     1.5,    JobClass.Heavyaxe);
     }
+    #endregion
+
+    #region Blademaster Weapons
     public class BlademasterWeapons
     {
         //                                            Name                   Lvl Atk     Crit    Required Class
@@ -63,6 +84,9 @@ namespace dotHack_Discord_Game
         public static Weapon HeavenAndEarth = new Weapon("Heaven & Earth",   16, 20,     1.5,    JobClass.Blademaster);
         public static Weapon Matoi = new Weapon("Matoi",                     23, 23,     1.5,    JobClass.Blademaster);
     }
+    #endregion
+
+    #region Wavemaster Weapons
     public class WavemasterWeapons
     {
         //                                            Name                   Lvl Atk     Crit    Required Class
@@ -74,5 +98,9 @@ namespace dotHack_Discord_Game
         public static Weapon Nerd_Staff = new Weapon("Nerd Staff",           18, 14,     2,      JobClass.Wavemaster);
         public static Weapon Gaias_Staff = new Weapon("Gaia's Staff",        20, 16,     2,      JobClass.Wavemaster);
     }
+    #endregion
+
+    #region Misc Weapons
     public class KnucklemasterWeapons { }
+    #endregion
 }

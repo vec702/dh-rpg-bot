@@ -1,4 +1,5 @@
-﻿using dotHack_Discord_Game.Models;
+﻿#region Usings
+using dotHack_Discord_Game.Models;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+#endregion
 
 namespace dotHack_Discord_Game
 {
@@ -29,7 +31,7 @@ namespace dotHack_Discord_Game
 
         #region //exprate
         [Command("exprate"), Description("Set the EXP Rate at which the bot will reward players.")]
-        public async Task exprate(CommandContext ctx, params double[] _newRate)
+        public async Task EXPRate(CommandContext ctx, params double[] _newRate)
         {
             if(ctx.Member.IsOwner)
             {
@@ -48,7 +50,7 @@ namespace dotHack_Discord_Game
 
         #region //droprate
         [Command("droprate"), Description("Set the DROP Rate at which the bot will reward players items.")]
-        public async Task droprate(CommandContext ctx, params double[] _newRate)
+        public async Task DropRate(CommandContext ctx, params double[] _newRate)
         {
             if (ctx.Member.IsOwner)
             {
@@ -67,7 +69,7 @@ namespace dotHack_Discord_Game
 
         #region //dmgrate
         [Command("dmgrate"), Description("Set the rate at which the bot will calculate damage.")]
-        public async Task dmgrate(CommandContext ctx, params double[] _newRate)
+        public async Task DMGRate(CommandContext ctx, params double[] _newRate)
         {
             if (ctx.Member.IsOwner)
             {
@@ -240,20 +242,62 @@ namespace dotHack_Discord_Game
                         }
                     }
                     else await Bot.SendMessage("Usage: //equip [item name]");
-                    /*
-                    else
+                }
+            }
+            else
+            {
+                await Bot.SendMessage("User does not exist! Have you tried to \"//signup\"?");
+            }
+        }
+        #endregion
+
+        #region //use
+        [Command("use"), Description("Use a specific item in your inventory.")]
+        public async Task Use(CommandContext ctx, params string[] _item)
+        {
+            if (Bot.Players.ContainsKey(ctx.User.Id.ToString()))
+            {
+                if (Bot.Players.TryGetValue(ctx.User.Id.ToString(), out Player p))
+                {
+                    var embed = new DiscordEmbedBuilder()
                     {
-                        string inventoryOutput = string.Empty;
-                        inventoryOutput += string.Join(", ", p.Inventory.Select(weapon => weapon.Name).ToArray());
-                        embed.Description += inventoryOutput;
+                        Title = "Monster Portal // " + p.Name,
+                        Description = "Inventory: ",
+                    };
 
-                        await ctx.Client.GetChannelAsync(Bot.BotChannelID).GetAwaiter().GetResult().SendMessageAsync(embed);
+                    if (_item.Count() > 0)
+                    {
+                        string readItem = string.Empty;
+                        for (int i = 0; i < _item.Count(); i++)
+                        {
+                            readItem += _item[i] + " ";
+                        }
 
-                        // wait for user to respond with input
+                        readItem = readItem.Substring(0, readItem.Length - 1);
+                        string compareItem = readItem.ToUpper();
+                        var found = false;
 
-                        // set equipped weapon to that input
+                        foreach (Item item in p.Items)
+                        {
+                            // we're gonna use the found bool twice
+                            // to make sure this only runs once, as opposed to the quantity of the items in storage.
+                            if(!found)
+                            {
+                                if (compareItem.Contains(item.Name.ToUpper()) || compareItem.Equals(item.Name, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    found = true;
+                                    item.Use(p);
+                                    await Bot.SendMessage(p.Name + " used the " + item.Name + ".");
+                                }
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            await Bot.SendMessage("Could not find any item matching name \"" + readItem + "\"");
+                        }
                     }
-                    */
+                    else await Bot.SendMessage("Usage: //use [item name]");
                 }
             }
             else
@@ -286,7 +330,7 @@ namespace dotHack_Discord_Game
             {
                 if (!Bot.Players.TryGetValue(ctx.User.Id.ToString(), out Player p))
                 {
-                    await Data.LoadSettings();
+                    await Data.LoadSettings(ctx.User);
                 }
             }
         }
@@ -305,7 +349,7 @@ namespace dotHack_Discord_Game
                         Title = "Monster Portal // " + p.Name,
                         Description = "Class: " + p.Class.ToString() + "\nLevel: " + p.Level +
                             "\nExperience: " + p.Experience + " / " + p.Max_Experience +
-                            "\nEquipped Weapon: " + p.Equip.Name + " (" + p.Equip.Attack + " Attack)" +
+                            "\nEquipped Weapon: " + p.Equip.Name + " (" + p.Equip.Attack + " Attack) (" + p.Equip.Crit_Rate + "% Crit Rate)" +
                             "\nEnemies defeated: " + p.Kills.ToString(),
                     };
 
@@ -316,7 +360,7 @@ namespace dotHack_Discord_Game
                     itemsOutput += itemsOutput.Count() % 5 == 0 ? string.Join(", ", p.Items.Select(item => item.Name).ToArray()) : "\n";
                     embed.Description += itemsOutput;
 
-                    embed.Description += "\nInventory: ";
+                    embed.Description += "\nEquipment: ";
 
                     string inventoryOutput = string.Empty;
                     inventoryOutput += inventoryOutput.Count() % 5 == 0 ? string.Join(", ",
