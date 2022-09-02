@@ -48,6 +48,8 @@ namespace dotHack_Discord_Game
         private readonly Weapon[] t5Drops = new Weapon[] { LongarmWeapons.Berserk_Spear, TwinbladeWeapons.Shirogane, HeavybladeWeapons.Sharp_Blade, HeavyaxeWeapons.Masters_Axe, BlademasterWeapons.Glitter, WavemasterWeapons.Bubble_Rod };
         private readonly Weapon[] t6Drops = new Weapon[] { LongarmWeapons.Steel_Spear, TwinbladeWeapons.Slayers, HeavybladeWeapons.Claymore, HeavyaxeWeapons.Full_Swing, BlademasterWeapons.HeavenAndEarth, WavemasterWeapons.Nerd_Staff };
         private readonly Weapon[] t7Drops = new Weapon[] { LongarmWeapons.Adamant_Lance, TwinbladeWeapons.Kyoura, HeavybladeWeapons.Light_Giver, HeavyaxeWeapons.Sinners_Axe, BlademasterWeapons.Matoi, WavemasterWeapons.Gaias_Staff };
+        private readonly Weapon[] t8Drops = new Weapon[] { LongarmWeapons.Dragnir, TwinbladeWeapons.Enja, HeavybladeWeapons.Crusher, HeavyaxeWeapons.Sorcerys_Axe, BlademasterWeapons.Phantom, WavemasterWeapons.Tenami };
+        private readonly Weapon[] t9Drops = new Weapon[] { LongarmWeapons.Happiness, TwinbladeWeapons.Specter_Blades, HeavybladeWeapons.High_Forger, HeavyaxeWeapons.Alien_Axe, BlademasterWeapons.Pegasus_Comet, WavemasterWeapons.Cygnus_Rod };
 
         private readonly Item[] t1iDrops = new Item[] { UsableItems.AttackPlus_Book, UsableItems.CritPlus_Book };
         private readonly Item[] t2iDrops = new Item[] { UsableItems.Virus_Core };
@@ -325,7 +327,7 @@ namespace dotHack_Discord_Game
         private Monster RandomMonster()
         {
             Random random = new Random();
-            var response = random.Next(1, 15);
+            var response = random.Next(1, 36);
             switch (response)
             {
                 case 0:
@@ -355,78 +357,53 @@ namespace dotHack_Discord_Game
                 case 12:
                     return new Monster("Comad Goo", "https://static.wikia.nocookie.net/dothack/images/8/8a/(062)_Comad_Goo.jpg", 30, t6Drops, null);
                 case 13:
-                    return new Monster("Dalaigon Anecdote", "https://static.wikia.nocookie.net/dothack/images/b/b0/(213)_Dalaigon_Anecdote.jpg", 35, t7Drops, null);
+                    return new Monster("Dalaigon Anecdote", "https://static.wikia.nocookie.net/dothack/images/b/b0/(213)_Dalaigon_Anecdote.jpg", 35, t7Drops, t1iDrops);
                 case 14:
                     return new Monster("Dark Guru", "https://static.wikia.nocookie.net/dothack/images/f/fd/(028)_Dark_Guru.jpg", 25, t5Drops, t1iDrops);
                 case 15:
                     return new Monster("Dark Horse", "https://static.wikia.nocookie.net/dothack/images/f/f9/(009)_Dark_Horse.jpg", 20, t4Drops, t1iDrops);
+                case 16:
+                    return new Monster("Dark Lord", "https://static.wikia.nocookie.net/dothack/images/8/8d/(035)_Dark_Lord.jpg", 35, t7Drops, t1iDrops);
+                case 17:
+                    return new Monster("Deadly Present", "https://static.wikia.nocookie.net/dothack/images/b/b5/(244)_Deadly_Present.jpg", 40, t8Drops, t1iDrops);
+                case 18:
+                    return new Monster("Fake Money", "https://static.wikia.nocookie.net/dothack/images/b/be/(240)_Fake_Money.jpg", 5, t1Drops, t1iDrops);
+                case 19:
+                    return new Monster("Death Head", "https://static.wikia.nocookie.net/dothack/images/a/ac/(246)_Death_Head.jpg", 10, t2Drops, t1iDrops);
+                case 20:
+                    return new Monster("Gladiator", "https://static.wikia.nocookie.net/dothack/images/6/6f/(003)_Gladiator.jpg", 20, t4Drops, t1iDrops);
+                case 21:
+                    return new Monster("Grand Electric", "https://static.wikia.nocookie.net/dothack/images/b/bc/(026)_Grand_Electric.jpg", 5, t1Drops, t1iDrops);
+                case 22:
+                    return new Monster("Headhunter", "https://static.wikia.nocookie.net/dothack/images/2/2e/(253)_Headhunter.jpg", 35, t7Drops, t1iDrops);
+                case 23:
+                    return new Monster("Heavy Metal", "https://static.wikia.nocookie.net/dothack/images/b/b0/(006)_Heavy_Metal.jpg", 15, t3Drops, t1iDrops);
+                case 24:
+                    return new Monster("Hell Box", "https://static.wikia.nocookie.net/dothack/images/6/69/(242)_Hell_Box.jpg", 40, t8Drops, t1iDrops);
+                case 25:
+                    return new Monster("Killer Box", "https://static.wikia.nocookie.net/dothack/images/0/0f/(243)_Killer_Box.jpg", 40, t8Drops, t1iDrops);
+                case 26:
+                    return new Monster("Lich Lord", "https://static.wikia.nocookie.net/dothack/images/b/b8/(034)_Lich_Lord.jpg", 30, t6Drops, t1iDrops);
+                case 27:
+                    return new Monster("Nightmare", "https://static.wikia.nocookie.net/dothack/images/1/1f/(010)_Nightmare.jpg", 40, t8Drops, t1iDrops);
+                case 28:
+                    return new Monster("Nomadic Bones", "https://static.wikia.nocookie.net/dothack/images/0/0e/(247)_Nomadic_Bones.jpg", 15, t3Drops, t1iDrops);
+                case 29:
+                    return new Monster("Ochimusha", "https://static.wikia.nocookie.net/dothack/images/f/f1/(004)_Ochimusha.jpg", 20, t4Drops, t1iDrops);
+                case 30:
+                    return new Monster("Pandora's Box", "https://static.wikia.nocookie.net/dothack/images/7/71/'s_Box.jpg", 40, t8Drops, t1iDrops);
+                case 31:
+                    return new Monster("Phalanx", "https://static.wikia.nocookie.net/dothack/images/0/0f/(007)_Phalanx.jpg", 30, t6Drops, t1iDrops);
+                case 32:
+                    return new Monster("Skull Hero", "https://static.wikia.nocookie.net/dothack/images/0/0b/(249)_Skull_Hero.jpg", 10, t2Drops, t1iDrops);
+                case 33:
+                    return new Monster("Spin Figure", "https://static.wikia.nocookie.net/dothack/images/a/a7/(063)_Spin_Figure.jpg", 35, t7Drops, t1iDrops);
+                case 34:
+                    return new Monster("Swordmanoid", "https://static.wikia.nocookie.net/dothack/images/5/54/(002)_Swordmanoid.jpg", 10, t2Drops, t1iDrops);
+                case 35:
+                    return new Monster("Undead Voodoo", "https://static.wikia.nocookie.net/dothack/images/8/88/(252)_Undead_Voodoo.jpg", 35, t7Drops, t1iDrops);
                 default:
                     return new Monster("", "", 0, null, null);
-
-                    /* 
-
-                        old format, still need to merge these...
-
-                        return new string[] { "Dark Lord", "https://static.wikia.nocookie.net/dothack/images/8/8d/(035)_Dark_Lord.jpg", "20" };
-                    case 17:
-                        return new string[] { "Deadly Present", "https://static.wikia.nocookie.net/dothack/images/b/b5/(244)_Deadly_Present.jpg", "15" };
-                    case 18:
-                        return new string[] { "Fake Money", "https://static.wikia.nocookie.net/dothack/images/b/be/(240)_Fake_Money.jpg", "20" };
-                    case 19:
-                        return new string[] { "Death Head", "https://static.wikia.nocookie.net/dothack/images/a/ac/(246)_Death_Head.jpg", "20" };
-                    case 20:
-                        return new string[] { "Gladiator", "https://static.wikia.nocookie.net/dothack/images/6/6f/(003)_Gladiator.jpg", "25" };
-                    case 21:
-                        return new string[] { "Grand Electric", "https://static.wikia.nocookie.net/dothack/images/b/bc/(026)_Grand_Electric.jpg", "15" };
-                    case 22:
-                        return new string[] { "Headhunter", "https://static.wikia.nocookie.net/dothack/images/2/2e/(253)_Headhunter.jpg", "25" };
-                    case 23:
-                        return new string[] { "Heavy Metal", "https://static.wikia.nocookie.net/dothack/images/b/b0/(006)_Heavy_Metal.jpg", "20" };
-                    case 24:
-                        return new string[] { "Hell Box", "https://static.wikia.nocookie.net/dothack/images/6/69/(242)_Hell_Box.jpg", "15" };
-                    case 25:
-                        return new string[] { "Killer Box", "https://static.wikia.nocookie.net/dothack/images/0/0f/(243)_Killer_Box.jpg", "15" };
-                    case 26:
-                        return new string[] { "Lich Lord", "https://static.wikia.nocookie.net/dothack/images/b/b8/(034)_Lich_Lord.jpg", "25" };
-                    case 27:
-                        return new string[] { "Nightmare", "https://static.wikia.nocookie.net/dothack/images/1/1f/(010)_Nightmare.jpg", "20" };
-                    case 28:
-                        return new string[] { "Nomadic Bones", "https://static.wikia.nocookie.net/dothack/images/0/0e/(247)_Nomadic_Bones.jpg", "15" };
-                    case 29:
-                        return new string[] { "Ochimusha", "https://static.wikia.nocookie.net/dothack/images/f/f1/(004)_Ochimusha.jpg", "20" };
-                    case 30:
-                        return new string[] { "Pandora's Box", "https://static.wikia.nocookie.net/dothack/images/7/71/'s_Box.jpg", "15" };
-                    case 31:
-                        return new string[] { "Phalanx", "https://static.wikia.nocookie.net/dothack/images/0/0f/(007)_Phalanx.jpg", "20" };
-                    case 32:
-                        return new string[] { "Skull Hero", "https://static.wikia.nocookie.net/dothack/images/0/0b/(249)_Skull_Hero.jpg", "15" };
-                    case 33:
-                        return new string[] { "Spin Figure", "https://static.wikia.nocookie.net/dothack/images/a/a7/(063)_Spin_Figure.jpg", "30" };
-                    case 34:
-                        return new string[] { "Swordmanoid", "https://static.wikia.nocookie.net/dothack/images/5/54/(002)_Swordmanoid.jpg", "15" };
-                    case 35:
-                        return new string[] { "Undead Voodoo", "https://static.wikia.nocookie.net/dothack/images/8/88/(252)_Undead_Voodoo.jpg", "20" };
-                    case 36:
-                        return new string[] { "Twilight Guardian", "https://static.wikia.nocookie.net/dothack/images/f/fa/Guardian.jpg", "300" };
-                    case 37:
-                        return new string[] { "Skeith", "https://static.wikia.nocookie.net/dothack/images/d/d6/Skeith.png", "150" };
-                    case 38:
-                        return new string[] { "Innis", "https://static.wikia.nocookie.net/dothack/images/e/ef/Innis.JPG", "150" };
-                    case 39:
-                        return new string[] { "Magus", "https://static.wikia.nocookie.net/dothack/images/4/4f/Magus.JPG", "150" };
-                    case 40:
-                        return new string[] { "Fidchell", "https://static.wikia.nocookie.net/dothack/images/b/bf/Fidchell.JPG", "150" };
-                    case 41:
-                        return new string[] { "Gorre", "https://static.wikia.nocookie.net/dothack/images/3/31/Gorre.png", "150" };
-                    case 42:
-                        return new string[] { "Macha", "https://static.wikia.nocookie.net/dothack/images/b/b2/Macha.JPG", "150" };
-                    case 43:
-                        return new string[] { "Tarvos", "https://static.wikia.nocookie.net/dothack/images/f/f9/Tarvos.JPG", "150" };
-                    case 44:
-                        return new string[] { "Corbenik", "https://static.wikia.nocookie.net/dothack/images/9/99/Corbenik.JPG", "150" };
-                    default:
-                        return new string[] { "", "", "" };
-                    */
             }
         }
         #endregion
@@ -724,15 +701,29 @@ namespace dotHack_Discord_Game
         private CorruptedMonster RandomCorruptedMonster()
         {
             Random random = new Random();
-            var response = random.Next(1, 3);
+            var response = random.Next(1, 10);
             Monster randomMonster = RandomMonster();
 
             switch (response)
             {
                 case 1:
-                    return new CorruptedMonster(randomMonster, "Twilight Guardian", "https://static.wikia.nocookie.net/dothack/images/f/fa/Guardian.jpg", 200, null, t2iDrops);
+                    return new CorruptedMonster(randomMonster, "Twilight Guardian", "https://static.wikia.nocookie.net/dothack/images/f/fa/Guardian.jpg", 200, t9Drops, t2iDrops);
                 case 2:
-                    return new CorruptedMonster(randomMonster, "Skeith", "https://static.wikia.nocookie.net/dothack/images/d/d6/Skeith.png", 150, null, t2iDrops);
+                    return new CorruptedMonster(randomMonster, "Skeith", "https://static.wikia.nocookie.net/dothack/images/d/d6/Skeith.png", 150, t9Drops, t2iDrops);
+                case 3:
+                    return new CorruptedMonster(randomMonster, "Innis", "https://static.wikia.nocookie.net/dothack/images/e/ef/Innis.JPG", 150, t9Drops, t2iDrops);
+                case 4:
+                    return new CorruptedMonster(randomMonster, "Magus", "https://static.wikia.nocookie.net/dothack/images/4/4f/Magus.JPG", 150, t9Drops, t2iDrops);
+                case 5:
+                    return new CorruptedMonster(randomMonster, "Fidchell", "https://static.wikia.nocookie.net/dothack/images/b/bf/Fidchell.JPG", 150, t9Drops, t2iDrops);
+                case 6:
+                    return new CorruptedMonster(randomMonster, "Gorre", "https://static.wikia.nocookie.net/dothack/images/3/31/Gorre.png", 150, t9Drops, t2iDrops);
+                case 7:
+                    return new CorruptedMonster(randomMonster, "Macha", "https://static.wikia.nocookie.net/dothack/images/b/b2/Macha.JPG", 150, t9Drops, t2iDrops);
+                case 8:
+                    return new CorruptedMonster(randomMonster, "Tarvos", "https://static.wikia.nocookie.net/dothack/images/f/f9/Tarvos.JPG", 150, t9Drops, t2iDrops);
+                case 9:
+                    return new CorruptedMonster(randomMonster, "Corbenik", "https://static.wikia.nocookie.net/dothack/images/9/99/Corbenik.JPG", 150, t9Drops, t2iDrops);
                 default:
                     return new CorruptedMonster(new Monster("", "", 0, null, null), "", "", 0, null, null);
             }
@@ -835,7 +826,7 @@ namespace dotHack_Discord_Game
             Weapon drop = null;
             Item idrop = null;
 
-            var dropChance = Convert.ToInt32(random.Next(1, 100) * dropRate);
+            var dropChance = Convert.ToInt32(random.Next(1, 101) * dropRate);
 
             if (dropChance > 80)
             {
@@ -863,6 +854,9 @@ namespace dotHack_Discord_Game
                 }
                 else
                 {
+                    // if they roll less than 99+, award them one drop normally.
+
+                    // decide whether we will give them an item or a weapon.
                     var itemOrWeapon = random.Next(1, 3);
 
                     switch (itemOrWeapon)
