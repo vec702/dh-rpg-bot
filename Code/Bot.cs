@@ -202,7 +202,12 @@ namespace dotHack_Discord_Game
                             }
                             else
                             {
-                                if(!messageSent) await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                // spam prevention
+                                if (!messageSent)
+                                {
+                                    messageSent = true;
+                                    await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                }
                             }
                         }
                     }
@@ -234,13 +239,20 @@ namespace dotHack_Discord_Game
                     if (timer.Enabled) timer.Stop();
                     timer.Start();
 
+                    var messageSent_2 = false;
+
                     while (health_left > 0)
                     {
                         foreach (var user in await monsterMessage.GetReactionsAsync(emoji))
                         {
                             if (!IsRegistered(user) && !user.IsBot)
                             {
-                                await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                // spam prevention
+                                if (!messageSent_2)
+                                {
+                                    messageSent_2 = true;
+                                    await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                }
                             }
                             else
                             {
@@ -286,7 +298,7 @@ namespace dotHack_Discord_Game
 
                     if (health_left <= 0)
                     {
-                        _Description = "Befallen by " + attackers.First().Username.ToString();
+                        _Description = "Defeated by " + attackers.First().Username.ToString();
 
                         foreach (var attacker in attackers)
                         {
@@ -447,6 +459,8 @@ namespace dotHack_Discord_Game
 
                 var portalResult = await interactivity.CollectReactionsAsync(portalMessage, TimeSpan.FromSeconds(0.5));
 
+                var messageSent = false;
+
                 while (portalSpawned)
                 {
                     // read the users who reacted
@@ -463,7 +477,12 @@ namespace dotHack_Discord_Game
                             }
                             else
                             {
-                                await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                // spam prevention
+                                if (!messageSent)
+                                {
+                                    messageSent = true;
+                                    await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                }
                             }
                         }
                     }
@@ -495,13 +514,20 @@ namespace dotHack_Discord_Game
                     if (timer.Enabled) timer.Stop();
                     timer.Start();
 
+                    var messageSent_2 = false;
+
                     while (health_left > 0)
                     {
                         foreach (var user in await monsterMessage.GetReactionsAsync(emoji))
                         {
                             if (!IsRegistered(user) && !user.IsBot)
                             {
-                                await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                // spam prevention
+                                if (!messageSent_2)
+                                {
+                                    messageSent_2 = true;
+                                    await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                }
                             }
                             else
                             {
@@ -564,6 +590,8 @@ namespace dotHack_Discord_Game
                         protectBreakMessage = await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync(pbEmbed);
                         await protectBreakMessage.CreateReactionAsync(emoji);
 
+                        var messageSent_3 = false;
+
                         while (!randomMonster.Drained)
                         {
                             foreach (var user in await protectBreakMessage.GetReactionsAsync(emoji))
@@ -576,7 +604,15 @@ namespace dotHack_Discord_Game
                                         await SendMessage("The monster's data has been drained by " + player.Name.ToString() + ", it's changing form!");
                                         randomMonster.Drained = true;
                                     }
-                                    else await SendMessage("The data isn't responding to you...");
+                                    else
+                                    {
+                                        // spam prevention
+                                        if(!messageSent_3)
+                                        {
+                                            messageSent_3 = true;
+                                            await SendMessage("The data isn't responding to " + player.Name.ToString());
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -603,13 +639,20 @@ namespace dotHack_Discord_Game
                             if (timer.Enabled) timer.Stop();
                             timer.Start();
 
+                            var messageSent_4 = false;
+
                             while (health_left > 0)
                             {
                                 foreach (var user in await monsterMessage.GetReactionsAsync(emoji))
                                 {
                                     if (!IsRegistered(user) && !user.IsBot)
                                     {
-                                        await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                        // spam prevention
+                                        if(!messageSent_4)
+                                        {
+                                            messageSent_4 = true;
+                                            await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                        }
                                     }
                                     else
                                     {
