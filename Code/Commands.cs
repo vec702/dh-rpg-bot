@@ -92,7 +92,7 @@ namespace dotHack_Discord_Game
         [Command("signup"), Description("Sign-up to fight .hack// enemies.")]
         public async Task Signup(CommandContext ctx, params string[] _class)
         {
-            var p = new Player(ctx.User.Id, ctx.User.Username.ToString());
+            var p = new Player(ctx.User.Id, ctx.Member.DisplayName.ToString());
             if (!Bot.Players.ContainsKey(p.Id.ToString()))
             {
                 if (_class.Count() > 0)
@@ -182,7 +182,7 @@ namespace dotHack_Discord_Game
             }
             else
             {
-                await Bot.SendMessage("User " + ctx.User.Username.ToString() + " already exists!");
+                await Bot.SendMessage("User " + ctx.Member.DisplayName + " already exists!");
             }
         }
         #endregion

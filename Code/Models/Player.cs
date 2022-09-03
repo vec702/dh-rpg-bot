@@ -35,6 +35,7 @@ namespace dotHack_Discord_Game.Models
 
         public void Gain_Experience(int number)
         {
+            //await Bot.SendMessage($"{this.Name} gained {number} experience.");
             Experience += number;
             Levelcheck();
         }
@@ -49,12 +50,13 @@ namespace dotHack_Discord_Game.Models
 
             return toReturn;
         }
-        public void Levelcheck()
+        public async void Levelcheck()
         {
             while(Experience >= Max_Experience)
             {
                 Level++;
                 Experience -= Max_Experience;
+                await Bot.SendMessage($"**LVL UP!** {this.Name} has achieved level {this.Level}.");
             }
         }
     }
