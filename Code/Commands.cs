@@ -285,9 +285,12 @@ namespace dotHack_Discord_Game
                             {
                                 if (compareItem.Contains(item.Name.ToUpper()) || compareItem.Equals(item.Name, StringComparison.OrdinalIgnoreCase))
                                 {
-                                    found = true;
-                                    item.Use(p);
-                                    await Bot.SendMessage(p.Name + " used the " + item.Name + ".");
+                                    if(item.Name != "Twilight Bracelet")
+                                    {
+                                        found = true;
+                                        item.Use(p);
+                                        await Bot.SendMessage(p.Name + " used the " + item.Name + ".");
+                                    }
                                 }
                             }
                         }

@@ -73,7 +73,6 @@ namespace dotHack_Discord_Game
 
             var configJson = JsonConvert.DeserializeObject<ConfigJson>(json);
 
-
             var config = new DiscordConfiguration()
             {
                 Token = configJson.Token,
@@ -185,6 +184,7 @@ namespace dotHack_Discord_Game
                 await portalMessage.CreateReactionAsync(emoji);
 
                 var portalResult = await interactivity.CollectReactionsAsync(portalMessage, TimeSpan.FromSeconds(0.5));
+                var messageSent = false;
 
                 while (portalSpawned)
                 {
@@ -202,7 +202,7 @@ namespace dotHack_Discord_Game
                             }
                             else
                             {
-                                await SendMessage("You need to \"//signup\" before you can start fighting!");
+                                if(!messageSent) await SendMessage("You need to \"//signup\" before you can start fighting!");
                             }
                         }
                     }
