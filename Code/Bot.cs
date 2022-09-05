@@ -126,7 +126,7 @@ namespace dotHack_Discord_Game
 
             Random random = new Random();
             var chance = random.Next(1, 100);
-            if(chance > 90)
+            if(chance > 85)
             {
                 var ctx = cnext.CreateContext(e.Message, "//", command, args);
                 Task.Run(async () => await FightMonsters(ctx)); return Task.CompletedTask;
@@ -317,14 +317,14 @@ namespace dotHack_Discord_Game
                             var exp = Convert.ToInt32(random.Next(150, 175) * expRate);
 
                             p.Kills++;
-                            p.Gain_Experience(Convert.ToInt32(Math.Round(Convert.ToDouble(exp))));
+                            await p.Gain_Experience(Convert.ToInt32(Math.Round(Convert.ToDouble(exp))));
 
                             if (attacker != attackers[0])
                             {
                                 _Description += ", " + attacker.Username.ToString();
                             }
 
-                            HandleDrops(attacker, randomMonster);
+                            await HandleDrops(attacker, randomMonster);
 
                         }
                         await monsterMessage.ModifyAsync(x =>
@@ -725,10 +725,10 @@ namespace dotHack_Discord_Game
                                     var p = GetPlayer(attacker);
                                     var exp = Convert.ToInt32(random.Next(150, 175) * expRate);
 
-                                    HandleDrops(attacker, randomMonster.DrainedMonster);
+                                    await HandleDrops(attacker, randomMonster.DrainedMonster);
 
                                     p.Kills++;
-                                    p.Gain_Experience(Convert.ToInt32(Math.Round(Convert.ToDouble(exp))));
+                                    await p.Gain_Experience(Convert.ToInt32(Math.Round(Convert.ToDouble(exp))));
 
                                     if (attacker != attackers[0])
                                     {
@@ -861,24 +861,24 @@ namespace dotHack_Discord_Game
         #endregion
 
         #region Drop Functions
-        public async void AwardDrops(DiscordUser user, Monster Dropper, Weapon WeaponDrop, Item ItemDrop)
+        public async Task AwardDrops(DiscordUser user, Monster Dropper, Weapon WeaponDrop, Item ItemDrop)
         {
             var p = GetPlayer(user);
 
             if (ItemDrop != null)
             {
-                await SendMessage(p.Name + " received " + ItemDrop.Name + " from " + Dropper.Name + ".");
                 p.Items.Add(ItemDrop);
+                await SendMessage(p.Name + " received " + ItemDrop.Name + " from " + Dropper.Name + ".");
             }
 
             if (WeaponDrop != null)
             {
-                await SendMessage(p.Name + " received " + WeaponDrop.Name + " from " + Dropper.Name + ".");
                 p.Inventory.Add(WeaponDrop);
+                await SendMessage(p.Name + " received " + WeaponDrop.Name + " from " + Dropper.Name + ".");
             }
         }
 
-        public void HandleDrops(DiscordUser user, Monster randomMonster)
+        public async Task HandleDrops(DiscordUser user, Monster randomMonster)
         {
             Random random = new Random();
             Weapon drop = null;
@@ -901,11 +901,11 @@ namespace dotHack_Discord_Game
                         {
                             case 1:
                                 drop = randomMonster.Drops[weaponDropIndex];
-                                AwardDrops(user, randomMonster, drop, idrop);
+                                await AwardDrops(user, randomMonster, drop, null);
                                 break;
                             case 2:
                                 idrop = randomMonster.ItemDrops[itemDropIndex];
-                                AwardDrops(user, randomMonster, drop, idrop);
+                                await AwardDrops(user, randomMonster, null, idrop);
                                 break;
                         }
                     }
@@ -923,11 +923,11 @@ namespace dotHack_Discord_Game
                     {
                         case 1:
                             drop = randomMonster.Drops[weaponDropIndex];
-                            AwardDrops(user, randomMonster, drop, idrop);
+                            await AwardDrops(user, randomMonster, drop, null);
                             break;
                         case 2:
                             idrop = randomMonster.ItemDrops[itemDropIndex];
-                            AwardDrops(user, randomMonster, drop, idrop);
+                            await AwardDrops(user, randomMonster, null, idrop);
                             break;
                     }
                 }

@@ -92,7 +92,8 @@ namespace dotHack_Discord_Game
                     for (int j = 0; j < equipSpellsList.Count; j++)
                     {
                         string eq_skill_name = objs[0]["Equip"]["Spells"][j]["Name"].ToString().Trim().Replace(",", "");
-                        string eq_element_name = objs[0]["Equip"]["Spells"][j]["Element"].ToString().Trim().Replace(",", "");
+                        string eq_element_name = objs[0]["Equip"]["Spells"][j]["Element"]["Name"].ToString().Trim().Replace(",", "");
+
                         switch (eq_element_name)
                         {
                             case "Fire":
@@ -113,7 +114,7 @@ namespace dotHack_Discord_Game
                             case "Earth":
                                 eq_spells.Add(new Skill(eq_skill_name, Element.Earth()));
                                 break;
-                            default:
+                            case "None":
                                 eq_spells.Add(new Skill(eq_skill_name, Element.None()));
                                 break;
                         }

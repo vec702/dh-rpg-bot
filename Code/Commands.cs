@@ -292,8 +292,7 @@ namespace dotHack_Discord_Game
                                         if(!messageSent)
                                         {
                                             messageSent = true;
-                                            item.Use(p);
-                                            await Bot.SendMessage(p.Name + " used the " + item.Name + ".");
+                                            await item.Use(p);
                                         }
                                         
                                     }
@@ -308,12 +307,7 @@ namespace dotHack_Discord_Game
                             if (compareItem.Equals(spell.Name, StringComparison.OrdinalIgnoreCase))
                             {
                                 found = true;
-                                if (!messageSent)
-                                {
-                                    messageSent = true;
-                                    spell.Use(p);
-                                    await Bot.SendMessage($"{p.Name} prepares to cast {spell.Name}.");
-                                }
+                                await spell.Use(p);
                             }
                         }
 
@@ -407,6 +401,44 @@ namespace dotHack_Discord_Game
             else
             {
                 await Bot.SendMessage("User does not exist! Have you tried to \"//signup\"?");
+            }
+        }
+        #endregion
+
+        #region //spells
+        [Command("spells"), Description("See your known spells.")]
+        public async Task Spells(CommandContext ctx)
+        {
+            if (Bot.Players.ContainsKey(ctx.User.Id.ToString()))
+            {
+                if (Bot.Players.TryGetValue(ctx.User.Id.ToString(), out Player p))
+                {
+                    try
+                    {
+                        string spells = string.Empty;
+                        string element = string.Empty;
+
+                        foreach (var s in p.Equip.Spells)
+                        {
+                            if (s.Element.Name == "None") element = "No";
+                            else element = s.Element.Name;
+
+                            spells += $"*{s.Name}* - {element} Element\n";
+                        }
+
+                        var embed = new DiscordEmbedBuilder()
+                        {
+                            Title = $"Monster Portal // {p.Name} // Spells",
+                            Description = $"{spells}",
+                        };
+
+                        await Bot.SendMessage(embed);
+                    }
+                    catch(Exception ex)
+                    {
+                        await Bot.SendMessage("[DEBUG] Exception caught: " + ex.Message + "\n\nLog: " + ex.ToString());
+                    }
+                }
             }
         }
         #endregion

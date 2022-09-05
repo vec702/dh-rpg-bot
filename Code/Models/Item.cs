@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace dotHack_Discord_Game.Models
 {
@@ -19,11 +20,12 @@ namespace dotHack_Discord_Game.Models
             this.ItemType = _itemType;
         }
 
-        public async void Use(Player p)
+        public async Task Use(Player p)
         {
             p.Items.Remove(this);
+            await Bot.SendMessage(p.Name + " used the " + this.Name + ".");
 
-            switch(this.Name)
+            switch (this.Name)
             {
                 case "Attack+ Book":
                     p.Equip.Attack = p.Equip.Attack + 1;

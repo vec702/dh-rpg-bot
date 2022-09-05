@@ -1,6 +1,7 @@
 ﻿using System.Timers;
 using System;
 using Timer = System.Timers.Timer;
+using System.Threading.Tasks;
 
 namespace dotHack_Discord_Game.Models
 {
@@ -15,7 +16,7 @@ namespace dotHack_Discord_Game.Models
             Element = _element;
         }
 
-        public async void Use(Player p)
+        public async Task Use(Player p)
         {
             Timer timer = new Timer();
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace dotHack_Discord_Game.Models
 {
@@ -43,11 +44,11 @@ namespace dotHack_Discord_Game.Models
             Equip = weapon;
         }
 
-        public void Gain_Experience(int number)
+        public async Task Gain_Experience(int number)
         {
             //await Bot.SendMessage($"{this.Name} gained {number} experience.");
             Experience += number;
-            Levelcheck();
+            await Levelcheck();
         }
 
         public bool HasTwilightBracelet()
@@ -60,7 +61,7 @@ namespace dotHack_Discord_Game.Models
 
             return toReturn;
         }
-        public async void Levelcheck()
+        public async Task Levelcheck()
         {
             while(Experience >= Max_Experience)
             {
