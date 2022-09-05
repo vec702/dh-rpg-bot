@@ -32,10 +32,20 @@
         public int Health { get; set; }
         public Weapon[] Drops { get; set; }
         public Item[] ItemDrops { get; set; }
+        public Element Element { get; set; }
 
         public Monster(string _name, string _imageUrl, int _health, Weapon[] _drops, Item[] _itemDrops)
         {
             Name = _name;
+            ImageUrl = _imageUrl;
+            Health = _health;
+            Drops = _drops;
+            ItemDrops = _itemDrops;
+        }
+        public Monster(string _name, Element _element, string _imageUrl, int _health, Weapon[] _drops, Item[] _itemDrops)
+        {
+            Name = _name;
+            Element = _element;
             ImageUrl = _imageUrl;
             Health = _health;
             Drops = _drops;

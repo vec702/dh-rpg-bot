@@ -276,6 +276,7 @@ namespace dotHack_Discord_Game
                         readItem = readItem.Substring(0, readItem.Length - 1);
                         string compareItem = readItem.ToUpper();
                         var found = false;
+                        var messageSent = false;
 
                         foreach (Item item in p.Items)
                         {
@@ -283,24 +284,45 @@ namespace dotHack_Discord_Game
                             // to make sure this only runs once, as opposed to the quantity of the items in storage.
                             if(!found)
                             {
-                                if (compareItem.Contains(item.Name.ToUpper()) || compareItem.Equals(item.Name, StringComparison.OrdinalIgnoreCase))
+                                if (compareItem.Equals(item.Name, StringComparison.OrdinalIgnoreCase))
                                 {
                                     if(item.Name != "Twilight Bracelet")
                                     {
                                         found = true;
-                                        item.Use(p);
-                                        await Bot.SendMessage(p.Name + " used the " + item.Name + ".");
+                                        if(!messageSent)
+                                        {
+                                            messageSent = true;
+                                            item.Use(p);
+                                            await Bot.SendMessage(p.Name + " used the " + item.Name + ".");
+                                        }
+                                        
                                     }
+                                }
+                            }
+                        }
+
+                        messageSent = false;
+
+                        foreach(Skill spell in p.Equip.Spells)
+                        {
+                            if (compareItem.Equals(spell.Name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                found = true;
+                                if (!messageSent)
+                                {
+                                    messageSent = true;
+                                    spell.Use(p);
+                                    await Bot.SendMessage($"{p.Name} prepares to cast {spell.Name}.");
                                 }
                             }
                         }
 
                         if (!found)
                         {
-                            await Bot.SendMessage("Could not find any item matching name \"" + readItem + "\"");
+                            await Bot.SendMessage("Could not find any item or spell matching name \"" + readItem + "\"");
                         }
                     }
-                    else await Bot.SendMessage("Usage: //use [item name]");
+                    else await Bot.SendMessage("Usage: //use [item or spell name]");
                 }
             }
             else
@@ -347,31 +369,39 @@ namespace dotHack_Discord_Game
             {
                 if(Bot.Players.TryGetValue(ctx.User.Id.ToString(), out Player p))
                 {
-                    var embed = new DiscordEmbedBuilder()
+                    try
                     {
-                        Title = "Monster Portal // " + p.Name,
-                        Description = "Class: " + p.Class.ToString() + "\nLevel: " + p.Level +
+                        var embed = new DiscordEmbedBuilder()
+                        {
+                            Title = "Monster Portal // " + p.Name,
+                            Description = "Class: " + p.Class.ToString() + "\nLevel: " + p.Level +
                             "\nExperience: " + p.Experience + " / " + p.Max_Experience +
                             "\nEquipped Weapon: " + p.Equip.Name + " (" + p.Equip.Attack + " Attack) (" + p.Equip.Crit_Rate + "% Crit Rate)" +
+                            "\nSpells: " + p.Equip.ListSpells() +
                             "\nEnemies defeated: " + p.Kills.ToString(),
-                    };
+                        };
 
-                    embed.Description += "\nKey Items: ";
+                        embed.Description += "\nKey Items: ";
 
-                    string itemsOutput = string.Empty;
+                        string itemsOutput = string.Empty;
 
-                    itemsOutput += itemsOutput.Count() % 5 == 0 ? string.Join(", ", p.Items.Select(item => item.Name).ToArray()) : "\n";
-                    embed.Description += itemsOutput;
+                        itemsOutput += itemsOutput.Count() % 5 == 0 ? string.Join(", ", p.Items.Select(item => item.Name).ToArray()) : "\n";
+                        embed.Description += itemsOutput;
 
-                    embed.Description += "\nEquipment: ";
+                        embed.Description += "\nEquipment: ";
 
-                    string inventoryOutput = string.Empty;
-                    inventoryOutput += inventoryOutput.Count() % 5 == 0 ? string.Join(", ",
-                        p.Inventory.Select(weapon =>
-                            weapon.RequiredClass == p.Class ? weapon.Name + " (" + (weapon.calculateEquipStats(p)) + ")" : weapon.Name ).ToArray()) : "\n";
-                    embed.Description += inventoryOutput;
+                        string inventoryOutput = string.Empty;
+                        inventoryOutput += inventoryOutput.Count() % 5 == 0 ? string.Join(", ",
+                            p.Inventory.Select(weapon =>
+                                weapon.RequiredClass == p.Class ? weapon.Name + " (" + (weapon.calculateEquipStats(p)) + ")" : weapon.Name).ToArray()) : "\n";
+                        embed.Description += inventoryOutput;
 
-                    await Bot.SendMessage(embed);
+                        await Bot.SendMessage(embed);
+                    }
+                    catch(Exception ex)
+                    {
+                        await Bot.SendMessage("[DEBUG] Exception caught: " + ex.Message + "\n\nLog: " + ex.ToString());
+                    }
                 }
             }
             else

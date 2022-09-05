@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 #endregion
 
@@ -84,7 +85,43 @@ namespace dotHack_Discord_Game
                 int eq_attack = Convert.ToInt32(objs[0]["Equip"]["Attack"].ToString().Trim().Replace(",", ""));
                 double eq_crit_rate = Convert.ToDouble(objs[0]["Equip"]["Crit_Rate"].ToString().Trim().Replace(",", ""));
 
-                _Equip = new Weapon(eq_name, eq_level, eq_attack, eq_crit_rate, (JobClass)eq_class);
+                JArray equipSpellsList = (JArray)objs[0]["Equip"]["Spells"];
+                List<Skill> eq_spells = new List<Skill>();
+                if (equipSpellsList != null)
+                {
+                    for (int j = 0; j < equipSpellsList.Count; j++)
+                    {
+                        string eq_skill_name = objs[0]["Equip"]["Spells"][j]["Name"].ToString().Trim().Replace(",", "");
+                        string eq_element_name = objs[0]["Equip"]["Spells"][j]["Element"].ToString().Trim().Replace(",", "");
+                        switch (eq_element_name)
+                        {
+                            case "Fire":
+                                eq_spells.Add(new Skill(eq_skill_name, Element.Fire()));
+                                break;
+                            case "Water":
+                                eq_spells.Add(new Skill(eq_skill_name, Element.Water()));
+                                break;
+                            case "Thunder":
+                                eq_spells.Add(new Skill(eq_skill_name, Element.Thunder()));
+                                break;
+                            case "Darkness":
+                                eq_spells.Add(new Skill(eq_skill_name, Element.Darkness()));
+                                break;
+                            case "Wood":
+                                eq_spells.Add(new Skill(eq_skill_name, Element.Wood()));
+                                break;
+                            case "Earth":
+                                eq_spells.Add(new Skill(eq_skill_name, Element.Earth()));
+                                break;
+                            default:
+                                eq_spells.Add(new Skill(eq_skill_name, Element.None()));
+                                break;
+                        }
+                    }
+                }
+
+                _Equip = new Weapon(eq_name, eq_level, eq_attack, eq_crit_rate, (JobClass)eq_class, eq_spells);
+                player.Equip_Weapon(_Equip);
                 #endregion
 
                 #region Load Inventory Storage
@@ -104,15 +141,50 @@ namespace dotHack_Discord_Game
                         int eqi_class = Convert.ToInt32(objs[0]["Inventory"][i]["RequiredClass"].ToString().Trim().Replace(",", ""));
                         int eqi_attack = Convert.ToInt32(objs[0]["Inventory"][i]["Attack"].ToString().Trim().Replace(",", ""));
                         double eqi_crit_rate = Convert.ToDouble(objs[0]["Inventory"][i]["Crit_Rate"].ToString().Trim().Replace(",", ""));
-                        Weapon weapon = new Weapon(eqi_name, eqi_level, eqi_attack, eqi_crit_rate, (JobClass)eqi_class);
+                        
+                        // load equipment spells
+                        JArray spellsList = (JArray)objs[0]["Inventory"][i]["Spells"];
+                        List<Skill> eqi_spells = new List<Skill>();
+                        if(spellsList != null)
+                        {
+                            for (int j = 0; j < spellsList.Count; j++)
+                            {
+                                string eqi_skill_name = objs[0]["Inventory"][i]["Spells"][j]["Name"].ToString().Trim().Replace(",", "");
+                                string eqi_element_name = objs[0]["Inventory"][i]["Spells"][j]["Element"].ToString().Trim().Replace(",", "");
+                                switch (eqi_element_name)
+                                {
+                                    case "Fire":
+                                        eqi_spells.Add(new Skill(eqi_skill_name, Element.Fire()));
+                                        break;
+                                    case "Water":
+                                        eqi_spells.Add(new Skill(eqi_skill_name, Element.Water()));
+                                        break;
+                                    case "Thunder":
+                                        eqi_spells.Add(new Skill(eqi_skill_name, Element.Thunder()));
+                                        break;
+                                    case "Darkness":
+                                        eqi_spells.Add(new Skill(eqi_skill_name, Element.Darkness()));
+                                        break;
+                                    case "Wood":
+                                        eqi_spells.Add(new Skill(eqi_skill_name, Element.Wood()));
+                                        break;
+                                    case "Earth":
+                                        eqi_spells.Add(new Skill(eqi_skill_name, Element.Earth()));
+                                        break;
+                                    default:
+                                        eqi_spells.Add(new Skill(eqi_skill_name, Element.None()));
+                                        break;
+                                }
+                            }
+                        }
 
+                        Weapon weapon = new Weapon(eqi_name, eqi_level, eqi_attack, eqi_crit_rate, (JobClass)eqi_class, eqi_spells);
                         player.Inventory.Add(weapon);
                     }
                 }
 
                 if(itemsInv_Length > 0)
                 {
-                    // todo: logic for items
                     for (int i = 0; i < itemsInv_Length; i++)
                     {
                         string iname = objs[0]["Items"][i]["Name"].ToString().Trim().Replace(",", "");

@@ -35,9 +35,9 @@ namespace dotHack_Discord_Game
         private static bool despawned = false;
 
         #region Rates
-        public static double expRate = 3.0;
-        public static double dmgRate = 3.0;
-        public static double dropRate = 3.0;
+        public static double expRate = 1.0;
+        public static double dmgRate = 1.0;
+        public static double dropRate = 1.0;
         #endregion
 
         #region Drops
@@ -171,7 +171,7 @@ namespace dotHack_Discord_Game
                 var _ImageUrl = randomMonster.ImageUrl;
                 var _Title = randomMonster.Name;
                 var health_left = randomMonster.Health;
-                var _Description = "Health: " + health_left + "/" + randomMonster.Health;
+                var _Description = $"Element: {randomMonster.Element.Name}\nHealth: " + health_left + "/" + randomMonster.Health;
                 List<DiscordUser> attackers = new List<DiscordUser>();
 
                 portalSpawned = true;
@@ -264,14 +264,23 @@ namespace dotHack_Discord_Game
 
                                     var p = GetPlayer(user);
                                     damage = Convert.ToInt32(random.Next(p.Equip.Attack, p.Equip.Attack * Convert.ToInt32(p.Equip.Crit_Rate)) * dmgRate);
+                                    if (randomMonster.Element != null) damage = Element.CalculateElementalDamage(p.Element, randomMonster.Element, damage);
                                     damage = (int)Math.Round(Convert.ToDouble(damage), 0);
 
                                     health_left = health_left - damage;
                                     if (health_left < 0) health_left = 0;
-                                    _Description = "Health: " + health_left + "/" + randomMonster.Health;
+                                    _Description = $"Element: {randomMonster.Element.Name}" +
+                                        "\nHealth: " + health_left + "/" + randomMonster.Health;
 
-                                    if (damage > 1) await SendMessage(user.Username.ToString() + " attacks " + _Title + " for " + damage + " points of damage!");
-                                    else await SendMessage(user.Username.ToString() + " attacks " + _Title + " for " + damage + " point of damage!");
+                                    if (damage > 1)
+                                    {
+                                        if(p.CastedSpell != null) await SendMessage(user.Username.ToString() + $" uses {p.CastedSpell.Name} and attacks " + _Title + " for " + damage + " points of damage!");
+                                        else await SendMessage(user.Username.ToString() + " attacks " + _Title + " for " + damage + " points of damage!");
+                                    }
+                                    else
+                                    {
+                                        await SendMessage(user.Username.ToString() + " attacks " + _Title + " for " + damage + " point of damage!");
+                                    }
 
                                     await monsterMessage.ModifyAsync(x =>
                                     {
@@ -347,45 +356,45 @@ namespace dotHack_Discord_Game
                 case 1:
                     return new Monster("Razine", "https://static.wikia.nocookie.net/dothack/images/5/53/%28001%29_Razine.jpg", 5, t1Drops, t1iDrops);
                 case 2:
-                    return new Monster("Tetra Armor", "https://static.wikia.nocookie.net/dothack/images/2/22/(011)_Tetra_Armor.jpg", 10, t2Drops, t1iDrops);
+                    return new Monster("Tetra Armor", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/2/22/(011)_Tetra_Armor.jpg", 10, t2Drops, t1iDrops);
                 case 3:
-                    return new Monster("Nobunaga's Soul", "https://static.wikia.nocookie.net/dothack/images/7/7a/(005)_Nobunaga_Soul.jpg", 5, t1Drops, t1iDrops);
+                    return new Monster("Nobunaga's Soul", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/7/7a/(005)_Nobunaga_Soul.jpg", 5, t1Drops, t1iDrops);
                 case 4:
-                    return new Monster("Menhir", "https://static.wikia.nocookie.net/dothack/images/e/e7/(180)_Menhir.jpg", 10, t2Drops, t1iDrops);
+                    return new Monster("Menhir", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/e/e7/(180)_Menhir.jpg", 10, t2Drops, t1iDrops);
                 case 5:
-                    return new Monster("Drygon", "https://static.wikia.nocookie.net/dothack/images/2/2d/(212)_Drygon.jpg", 20, t4Drops, t1iDrops);
+                    return new Monster("Drygon", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/2/2d/(212)_Drygon.jpg", 20, t4Drops, t1iDrops);
                 case 6:
-                    return new Monster("Ectoplasm", "https://static.wikia.nocookie.net/dothack/images/a/a1/(281)_Ectoplasm.jpg", 5, t1Drops, t1iDrops);
+                    return new Monster("Ectoplasm", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/a/a1/(281)_Ectoplasm.jpg", 5, t1Drops, t1iDrops);
                 case 7:
-                    return new Monster("Noisy Wisp", "https://static.wikia.nocookie.net/dothack/images/f/f2/(282)_Noisy_Wisp.jpg", 5, t1Drops, t1iDrops);
+                    return new Monster("Noisy Wisp", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/f/f2/(282)_Noisy_Wisp.jpg", 5, t1Drops, t1iDrops);
                 case 8:
                     return new Monster("Mimic", "https://static.wikia.nocookie.net/dothack/images/8/8b/(241)_Mimic.jpg", 5, t1Drops, t1iDrops);
                 case 9:
-                    return new Monster("Squidbod", "https://static.wikia.nocookie.net/dothack/images/1/19/(012)_Squidbod.jpg", 15, t3Drops, null);
+                    return new Monster("Squidbod", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/1/19/(012)_Squidbod.jpg", 15, t3Drops, null);
                 case 10:
-                    return new Monster("General Armor", "https://static.wikia.nocookie.net/dothack/images/0/0f/(013)_General_Armor.jpg", 20, t4Drops, t1iDrops);
+                    return new Monster("General Armor", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/0/0f/(013)_General_Armor.jpg", 20, t4Drops, t1iDrops);
                 case 11:
-                    return new Monster("Bone Army", "https://static.wikia.nocookie.net/dothack/images/2/23/(248)_Bone_Army.jpg", 5, t1Drops, t1iDrops);
+                    return new Monster("Bone Army", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/2/23/(248)_Bone_Army.jpg", 5, t1Drops, t1iDrops);
                 case 12:
-                    return new Monster("Comad Goo", "https://static.wikia.nocookie.net/dothack/images/8/8a/(062)_Comad_Goo.jpg", 30, t6Drops, null);
+                    return new Monster("Comad Goo", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/8/8a/(062)_Comad_Goo.jpg", 30, t6Drops, null);
                 case 13:
-                    return new Monster("Dalaigon Anecdote", "https://static.wikia.nocookie.net/dothack/images/b/b0/(213)_Dalaigon_Anecdote.jpg", 35, t7Drops, t1iDrops);
+                    return new Monster("Dalaigon Anecdote", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/b/b0/(213)_Dalaigon_Anecdote.jpg", 35, t7Drops, t1iDrops);
                 case 14:
-                    return new Monster("Dark Guru", "https://static.wikia.nocookie.net/dothack/images/f/fd/(028)_Dark_Guru.jpg", 25, t5Drops, t1iDrops);
+                    return new Monster("Dark Guru", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/f/fd/(028)_Dark_Guru.jpg", 25, t5Drops, t1iDrops);
                 case 15:
-                    return new Monster("Dark Horse", "https://static.wikia.nocookie.net/dothack/images/f/f9/(009)_Dark_Horse.jpg", 20, t4Drops, t1iDrops);
+                    return new Monster("Dark Horse", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/f/f9/(009)_Dark_Horse.jpg", 20, t4Drops, t1iDrops);
                 case 16:
-                    return new Monster("Dark Lord", "https://static.wikia.nocookie.net/dothack/images/8/8d/(035)_Dark_Lord.jpg", 35, t7Drops, t1iDrops);
+                    return new Monster("Dark Lord", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/8/8d/(035)_Dark_Lord.jpg", 35, t7Drops, t1iDrops);
                 case 17:
                     return new Monster("Deadly Present", "https://static.wikia.nocookie.net/dothack/images/b/b5/(244)_Deadly_Present.jpg", 40, t8Drops, t1iDrops);
                 case 18:
                     return new Monster("Fake Money", "https://static.wikia.nocookie.net/dothack/images/b/be/(240)_Fake_Money.jpg", 5, t1Drops, t1iDrops);
                 case 19:
-                    return new Monster("Death Head", "https://static.wikia.nocookie.net/dothack/images/a/ac/(246)_Death_Head.jpg", 10, t2Drops, t1iDrops);
+                    return new Monster("Death Head", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/a/ac/(246)_Death_Head.jpg", 10, t2Drops, t1iDrops);
                 case 20:
-                    return new Monster("Gladiator", "https://static.wikia.nocookie.net/dothack/images/6/6f/(003)_Gladiator.jpg", 20, t4Drops, t1iDrops);
+                    return new Monster("Gladiator", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/6/6f/(003)_Gladiator.jpg", 20, t4Drops, t1iDrops);
                 case 21:
-                    return new Monster("Grand Electric", "https://static.wikia.nocookie.net/dothack/images/b/bc/(026)_Grand_Electric.jpg", 5, t1Drops, t1iDrops);
+                    return new Monster("Grand Electric", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/b/bc/(026)_Grand_Electric.jpg", 5, t1Drops, t1iDrops);
                 case 22:
                     return new Monster("Headhunter", "https://static.wikia.nocookie.net/dothack/images/2/2e/(253)_Headhunter.jpg", 35, t7Drops, t1iDrops);
                 case 23:
@@ -395,25 +404,25 @@ namespace dotHack_Discord_Game
                 case 25:
                     return new Monster("Killer Box", "https://static.wikia.nocookie.net/dothack/images/0/0f/(243)_Killer_Box.jpg", 40, t8Drops, t1iDrops);
                 case 26:
-                    return new Monster("Lich Lord", "https://static.wikia.nocookie.net/dothack/images/b/b8/(034)_Lich_Lord.jpg", 30, t6Drops, t1iDrops);
+                    return new Monster("Lich Lord", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/b/b8/(034)_Lich_Lord.jpg", 30, t6Drops, t1iDrops);
                 case 27:
-                    return new Monster("Nightmare", "https://static.wikia.nocookie.net/dothack/images/1/1f/(010)_Nightmare.jpg", 40, t8Drops, t1iDrops);
+                    return new Monster("Nightmare", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/1/1f/(010)_Nightmare.jpg", 40, t8Drops, t1iDrops);
                 case 28:
-                    return new Monster("Nomadic Bones", "https://static.wikia.nocookie.net/dothack/images/0/0e/(247)_Nomadic_Bones.jpg", 15, t3Drops, t1iDrops);
+                    return new Monster("Nomadic Bones", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/0/0e/(247)_Nomadic_Bones.jpg", 15, t3Drops, t1iDrops);
                 case 29:
-                    return new Monster("Ochimusha", "https://static.wikia.nocookie.net/dothack/images/f/f1/(004)_Ochimusha.jpg", 20, t4Drops, t1iDrops);
+                    return new Monster("Ochimusha", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/f/f1/(004)_Ochimusha.jpg", 20, t4Drops, t1iDrops);
                 case 30:
                     return new Monster("Pandora's Box", "https://static.wikia.nocookie.net/dothack/images/7/71/'s_Box.jpg", 40, t8Drops, t1iDrops);
                 case 31:
-                    return new Monster("Phalanx", "https://static.wikia.nocookie.net/dothack/images/0/0f/(007)_Phalanx.jpg", 30, t6Drops, t1iDrops);
+                    return new Monster("Phalanx", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/0/0f/(007)_Phalanx.jpg", 30, t6Drops, t1iDrops);
                 case 32:
-                    return new Monster("Skull Hero", "https://static.wikia.nocookie.net/dothack/images/0/0b/(249)_Skull_Hero.jpg", 10, t2Drops, t1iDrops);
+                    return new Monster("Skull Hero", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/0/0b/(249)_Skull_Hero.jpg", 10, t2Drops, t1iDrops);
                 case 33:
-                    return new Monster("Spin Figure", "https://static.wikia.nocookie.net/dothack/images/a/a7/(063)_Spin_Figure.jpg", 35, t7Drops, t1iDrops);
+                    return new Monster("Spin Figure", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/a/a7/(063)_Spin_Figure.jpg", 35, t7Drops, t1iDrops);
                 case 34:
                     return new Monster("Swordmanoid", "https://static.wikia.nocookie.net/dothack/images/5/54/(002)_Swordmanoid.jpg", 10, t2Drops, t1iDrops);
                 case 35:
-                    return new Monster("Undead Voodoo", "https://static.wikia.nocookie.net/dothack/images/8/88/(252)_Undead_Voodoo.jpg", 35, t7Drops, t1iDrops);
+                    return new Monster("Undead Voodoo", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/8/88/(252)_Undead_Voodoo.jpg", 35, t7Drops, t1iDrops);
                 default:
                     return new Monster("", "", 0, null, null);
             }
@@ -545,8 +554,14 @@ namespace dotHack_Discord_Game
                                     if (health_left < 0) health_left = 0;
                                     _Description = "Health: " + health_left + "/" + randomMonster.Health;
 
-                                    if (damage > 1) await SendMessage(user.Username.ToString() + " attacks " + _Title + " for " + damage + " points of damage!");
-                                    else await SendMessage(user.Username.ToString() + " attacks " + _Title + " for " + damage + " point of damage!");
+                                    if (damage > 1)
+                                    {
+                                        await SendMessage(user.Username.ToString() + " attacks " + _Title + " for " + damage + " points of damage!");
+                                    }
+                                    else
+                                    {
+                                        await SendMessage(user.Username.ToString() + " attacks " + _Title + " for " + damage + " point of damage!");
+                                    }
 
                                     await monsterMessage.ModifyAsync(x =>
                                     {
@@ -879,16 +894,16 @@ namespace dotHack_Discord_Game
                     for (var i = 0; i < 2; i++)
                     {
                         var itemOrWeapon = random.Next(1, 3);
+                        var weaponDropIndex = random.Next(0, randomMonster.Drops.Count());
+                        var itemDropIndex = random.Next(0, randomMonster.ItemDrops.Count());
 
                         switch (itemOrWeapon)
                         {
                             case 1:
-                                var weaponDropIndex = random.Next(1, randomMonster.Drops.Count());
                                 drop = randomMonster.Drops[weaponDropIndex];
                                 AwardDrops(user, randomMonster, drop, idrop);
                                 break;
                             case 2:
-                                var itemDropIndex = random.Next(1, randomMonster.ItemDrops.Count());
                                 idrop = randomMonster.ItemDrops[itemDropIndex];
                                 AwardDrops(user, randomMonster, drop, idrop);
                                 break;
@@ -901,16 +916,16 @@ namespace dotHack_Discord_Game
 
                     // decide whether we will give them an item or a weapon.
                     var itemOrWeapon = random.Next(1, 3);
+                    var weaponDropIndex = random.Next(0, randomMonster.Drops.Count());
+                    var itemDropIndex = random.Next(0, randomMonster.ItemDrops.Count());
 
                     switch (itemOrWeapon)
                     {
                         case 1:
-                            var weaponDropIndex = random.Next(1, randomMonster.Drops.Count());
                             drop = randomMonster.Drops[weaponDropIndex];
                             AwardDrops(user, randomMonster, drop, idrop);
                             break;
                         case 2:
-                            var itemDropIndex = random.Next(1, randomMonster.ItemDrops.Count());
                             idrop = randomMonster.ItemDrops[itemDropIndex];
                             AwardDrops(user, randomMonster, drop, idrop);
                             break;
