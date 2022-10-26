@@ -126,7 +126,7 @@ namespace dotHack_Discord_Game
 
             Random random = new Random();
             var chance = random.Next(1, 100);
-            if(chance > 85)
+            if(chance > 50)
             {
                 var ctx = cnext.CreateContext(e.Message, "//", command, args);
                 Task.Run(async () => await FightMonsters(ctx)); return Task.CompletedTask;
@@ -348,13 +348,13 @@ namespace dotHack_Discord_Game
         private Monster RandomMonster()
         {
             Random random = new Random();
-            var response = random.Next(1, 36);
+            var response = random.Next(1, 45);
             switch (response)
             {
                 case 0:
                     return new Monster("Aura", "https://static.wikia.nocookie.net/dothack/images/f/fc/Auraface.jpg", 1, null, new Item[] { KeyItems.Twilight_Bracelet });
                 case 1:
-                    return new Monster("Razine", "https://static.wikia.nocookie.net/dothack/images/5/53/%28001%29_Razine.jpg", 5, t1Drops, t1iDrops);
+                    return new Monster("Razine", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/5/53/%28001%29_Razine.jpg", 5, t1Drops, t1iDrops);
                 case 2:
                     return new Monster("Tetra Armor", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/2/22/(011)_Tetra_Armor.jpg", 10, t2Drops, t1iDrops);
                 case 3:
@@ -362,7 +362,7 @@ namespace dotHack_Discord_Game
                 case 4:
                     return new Monster("Menhir", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/e/e7/(180)_Menhir.jpg", 10, t2Drops, t1iDrops);
                 case 5:
-                    return new Monster("Drygon", Element.Thunder(), "https://static.wikia.nocookie.net/dothack/images/2/2d/(212)_Drygon.jpg", 20, t4Drops, t1iDrops);
+                    return new Monster("Drygon", Element.None(), "https://static.wikia.nocookie.net/dothack/images/2/2d/(212)_Drygon.jpg", 20, t4Drops, t1iDrops);
                 case 6:
                     return new Monster("Ectoplasm", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/a/a1/(281)_Ectoplasm.jpg", 5, t1Drops, t1iDrops);
                 case 7:
@@ -423,6 +423,24 @@ namespace dotHack_Discord_Game
                     return new Monster("Swordmanoid", "https://static.wikia.nocookie.net/dothack/images/5/54/(002)_Swordmanoid.jpg", 10, t2Drops, t1iDrops);
                 case 35:
                     return new Monster("Undead Voodoo", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/8/88/(252)_Undead_Voodoo.jpg", 35, t7Drops, t1iDrops);
+                case 36:
+                    return new Monster("Grand Mage", Element.Fire(), "https://static.wikia.nocookie.net/dothack/images/0/0d/Grandmage.jpg", 20, t4Drops, t1iDrops);
+                case 37:
+                    return new Monster("Hand of God", Element.Wood(), "https://static.wikia.nocookie.net/dothack/images/9/92/(019)_Hand_of_God.PNG", 30, t6Drops, t1iDrops);
+                case 38:
+                    return new Monster("Big Eyes", Element.Water(), "https://static.wikia.nocookie.net/dothack/images/7/76/(122)_Big_eyes.jpg", 40, t8Drops, t1iDrops);
+                case 39:
+                    return new Monster("Druid Witch", Element.Wood(), "https://static.wikia.nocookie.net/dothack/images/9/98/Druid_Witch.PNG", 35, t7Drops, t1iDrops);
+                case 40:
+                    return new Monster("Earth Maiden", Element.Earth(), "https://static.wikia.nocookie.net/dothack/images/3/3b/Earth_Maiden.PNG", 35, t7Drops, t1iDrops);
+                case 41:
+                    return new Monster("Ark Prince", Element.Fire(), "https://static.wikia.nocookie.net/dothack/images/c/cd/Arkprince.jpg", 30, t6Drops, t1iDrops);
+                case 42:
+                    return new Monster("Maxwell", Element.Darkness(), "https://static.wikia.nocookie.net/dothack/images/3/32/(093)_Maxwell.jpg", 25, t5Drops, t1iDrops);
+                case 43:
+                    return new Monster("Astro King", Element.Fire(), "https://static.wikia.nocookie.net/dothack/images/4/47/Astroking.jpg", 45, t9Drops, t1iDrops);
+                case 44:
+                    return new Monster("Crab Turtle", Element.Water(), "https://static.wikia.nocookie.net/dothack/images/3/30/CrabTurtle.PNG", 20, t4Drops, t1iDrops);
                 default:
                     return new Monster("", "", 0, null, null);
             }
@@ -837,6 +855,20 @@ namespace dotHack_Discord_Game
         {
             await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendMessageAsync(Message);
         }
+
+        public static async Task SendPaginatedMessage(DiscordUser user, string Message)
+        {
+            var interactivity = client.GetInteractivity();
+            var _message = interactivity.GeneratePagesInEmbed(Message);
+            await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendPaginatedMessageAsync(user, _message);
+        }
+
+        public static async Task SendPaginatedMessage(DiscordUser user, DiscordEmbed Message)
+        {
+            var interactivity = client.GetInteractivity();
+            var _message = interactivity.GeneratePagesInEmbed(Message.Description.ToString());
+            await client.GetChannelAsync(BotChannelID).GetAwaiter().GetResult().SendPaginatedMessageAsync(user, _message);
+        }
         #endregion
 
         #region Despawn Monster
@@ -893,39 +925,41 @@ namespace dotHack_Discord_Game
                 {
                     for (var i = 0; i < 2; i++)
                     {
-                        var itemOrWeapon = random.Next(1, 3);
+                        // decide whether we will give them an item or a weapon.
+                        var itemOrWeapon = random.Next(1, 4);
                         var weaponDropIndex = random.Next(0, randomMonster.Drops.Count());
                         var itemDropIndex = random.Next(0, randomMonster.ItemDrops.Count());
 
                         switch (itemOrWeapon)
                         {
-                            case 1:
+                            case 1: case 2:
                                 drop = randomMonster.Drops[weaponDropIndex];
                                 await AwardDrops(user, randomMonster, drop, null);
                                 break;
-                            case 2:
+                            case 3:
                                 idrop = randomMonster.ItemDrops[itemDropIndex];
                                 await AwardDrops(user, randomMonster, null, idrop);
                                 break;
                         }
                     }
                 }
+
+                // if they roll less than 99+, award them one drop normally.
                 else
                 {
-                    // if they roll less than 99+, award them one drop normally.
-
                     // decide whether we will give them an item or a weapon.
-                    var itemOrWeapon = random.Next(1, 3);
+                    var itemOrWeapon = random.Next(1, 4);
+
                     var weaponDropIndex = random.Next(0, randomMonster.Drops.Count());
                     var itemDropIndex = random.Next(0, randomMonster.ItemDrops.Count());
 
                     switch (itemOrWeapon)
                     {
-                        case 1:
+                        case 1: case 2:
                             drop = randomMonster.Drops[weaponDropIndex];
                             await AwardDrops(user, randomMonster, drop, null);
                             break;
-                        case 2:
+                        case 3:
                             idrop = randomMonster.ItemDrops[itemDropIndex];
                             await AwardDrops(user, randomMonster, null, idrop);
                             break;

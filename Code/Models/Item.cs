@@ -39,15 +39,20 @@ namespace dotHack_Discord_Game.Models
 
                 case "Virus Core":
                     Random random = new Random();
-                    if (random.Next(1, 3) == 1)
+                    var chance = random.Next(1, 4);
+                    if (chance == 1)
                     {
                         p.Equip.Attack += 2;
                         await Bot.SendMessage("The equipped " + p.Equip.Name + "'s attack stat has increased by +2.");
                     }
-                    else
+                    else if(chance == 2)
                     {
                         p.Equip.Crit_Rate = p.Equip.Crit_Rate + 0.04;
                         await Bot.SendMessage("The equipped " + p.Equip.Name + "'s crit rate stat has increased by .04%.");
+                    }
+                    else
+                    {
+                        await Bot.SendMessage("Nothing happened.");
                     }
                     break;
 

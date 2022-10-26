@@ -4,6 +4,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
+using Emzi0767;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -367,22 +368,26 @@ namespace dotHack_Discord_Game
                     {
                         var embed = new DiscordEmbedBuilder()
                         {
-                            Title = "Monster Portal // " + p.Name,
-                            Description = "Class: " + p.Class.ToString() + "\nLevel: " + p.Level +
-                            "\nExperience: " + p.Experience + " / " + p.Max_Experience +
-                            "\nEquipped Weapon: " + p.Equip.Name + " (" + p.Equip.Attack + " Attack) (" + p.Equip.Crit_Rate + "% Crit Rate)" +
-                            "\nSpells: " + p.Equip.ListSpells() +
-                            "\nEnemies defeated: " + p.Kills.ToString(),
+                            Title = $"Monster Portal // {p.Name}",
+                            
+                            Description = $"**Name:** {p.Name}" +
+                            "\n**Level:** " + p.Level +
+                            "\n**Class:** " + p.Class.ToString() +
+                            "\n**Experience:** " + p.Experience + " / " + p.Max_Experience +
+                            "\n**Enemies Defeated:** " + p.Kills.ToString() +
+                            "\n~~══════════════════════════~~\n**Equipped Weapon:** " + p.Equip.Name + " (" + p.Equip.Attack + " Attack) (" + p.Equip.Crit_Rate + "% Crit Rate)" +
+                            "\n**Spells:** " + p.Equip.ListSpells() +
+                            "\n~~══════════════════════════~~\n",
                         };
 
-                        embed.Description += "\nKey Items: ";
+                        embed.Description += "\n**Key Items:** ";
 
                         string itemsOutput = string.Empty;
 
                         itemsOutput += itemsOutput.Count() % 5 == 0 ? string.Join(", ", p.Items.Select(item => item.Name).ToArray()) : "\n";
                         embed.Description += itemsOutput;
 
-                        embed.Description += "\nEquipment: ";
+                        embed.Description += "\n**Equipment:** ";
 
                         string inventoryOutput = string.Empty;
                         inventoryOutput += inventoryOutput.Count() % 5 == 0 ? string.Join(", ",
@@ -390,7 +395,7 @@ namespace dotHack_Discord_Game
                                 weapon.RequiredClass == p.Class ? weapon.Name + " (" + (weapon.calculateEquipStats(p)) + ")" : weapon.Name).ToArray()) : "\n";
                         embed.Description += inventoryOutput;
 
-                        await Bot.SendMessage(embed);
+                        await Bot.SendPaginatedMessage(ctx.Member, embed);
                     }
                     catch(Exception ex)
                     {

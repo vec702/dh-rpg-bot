@@ -21,14 +21,16 @@ namespace dotHack_Discord_Game.Models
         public static Element Wood() { return new Element("Wood", "Earth"); }
         public static Element None() { return new Element("None", ""); }
 
-        public static int CalculateElementalDamage(Element User, Element Target, int number)
+        public static int CalculateElementalDamage(Element User, Element Target, double number)
         {
             if(Target.Weakness == User.Name)
             {
-                number *= 2;
+                number *= 1.5;
             }
 
-            return number;
+            number = Math.Round(number);
+
+            return Convert.ToInt32(number);
         }
     }
 }
